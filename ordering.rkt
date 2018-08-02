@@ -3,6 +3,8 @@
 (require "lang.rkt")
 (require "sketch.rkt")
 
+(provide (all-defined-out))
+
 ;; add one extra bucket for constant inputs
 (define (get-operator-histo)
   (make-hash (map (λ (idx val) (cons idx val)) (range (add1 (length operator-list))) (make-list (add1 (length operator-list)) 0))))
@@ -19,7 +21,7 @@
   (let* ([sk1-histo (build-operator-histo sk1)]
          [sk2-histo (build-operator-histo sk2)]
          [first-mismatch (findf (λ (p) (not (= (car p) (cdr p))))
-                                (for/list ([i (range (add1 (length operator-list)))])
+                                (for/list ([i (reverse (range (add1 (length operator-list))))])
                                   (cons (hash-ref sk1-histo i) (hash-ref sk2-histo i))))])
     (> (car first-mismatch) (cdr first-mismatch))))
 

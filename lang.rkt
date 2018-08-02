@@ -28,25 +28,6 @@
 
 (provide (all-defined-out))
 
-;; operators are in ascending strength order
-;; chose an arbitrary ordering for the overloaded operators
-(define operator-list
-  (list hld-add
-        hld-sub
-        hld-mod
-        hld-mul
-        hld-div
-        hld-min
-        hld-max
-        hld-eq-int
-        hld-eq-bool
-        hld-lt
-        hld-and
-        hld-or
-        hld-not
-        hld-select-int
-        hld-select-bool))
-
 (struct hld-int (indet const val) #:transparent)
 
 (define indeterminate (hld-int #t #f 0))
@@ -116,3 +97,22 @@
 ;; fold semantically does nothing, but is important for ordering
 (define (hld-fold i1)
   i1)
+
+;; operators are in ascending strength order
+;; chose an arbitrary ordering for the overloaded operators
+(define operator-list
+  (list hld-add
+        hld-sub
+        hld-mod
+        hld-mul
+        hld-div
+        hld-min
+        hld-max
+        hld-eq-int
+        hld-eq-bool
+        hld-lt
+        hld-and
+        hld-or
+        hld-not
+        hld-select-int
+        hld-select-bool))

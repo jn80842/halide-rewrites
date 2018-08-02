@@ -1,6 +1,6 @@
 #lang rosette
 
-;(require "lang.rkt")
+(require "lang.rkt")
 
 (provide (all-defined-out))
 
