@@ -101,18 +101,35 @@
 ;; operators are in ascending strength order
 ;; chose an arbitrary ordering for the overloaded operators
 (define operator-list
-  (list hld-add
-        hld-sub
-        hld-mod
-        hld-mul
-        hld-div
-        hld-min
-        hld-max
-        hld-eq-int
-        hld-eq-bool
-        hld-lt
-        hld-and
-        hld-or
-        hld-not
-        hld-select-int
-        hld-select-bool))
+  (list hld-add ;; 0
+        hld-sub ;; 1
+        hld-mod ;; 2
+        hld-mul ;; 3
+        hld-div ;; 4
+        hld-min ;; 5
+        hld-max ;; 6
+        hld-eq-int ;; 7
+        hld-eq-bool ;; 8
+        hld-lt ;; 9
+        hld-and ;; 10
+        hld-or ;; 11
+        hld-not ;; 12
+        hld-select-int ;; 13
+        hld-select-bool)) ;; 14
+
+(define (get-arity-by-idx idx)
+  (list-ref (list 2 ;; add
+                  2 ;; sub
+                  2 ;; mod
+                  2 ;; mul
+                  2 ;; div
+                  2 ;; min
+                  2 ;; max
+                  2 ;; eq int
+                  2 ;; eq bool
+                  2 ;; lt
+                  2 ;; and
+                  2 ;; or
+                  1 ;; not
+                  3 ;; select int
+                  3) idx))
