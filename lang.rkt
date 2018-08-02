@@ -26,14 +26,35 @@
 ;;         | WildBool
 ;;         | Bool;
 
-(struct hld-int (indet val) #:transparent)
+(provide (all-defined-out))
 
-(define indeterminate (hld-int #t 0))
+;; operators are in ascending strength order
+;; chose an arbitrary ordering for the overloaded operators
+(define operator-list
+  (list hld-add
+        hld-sub
+        hld-mod
+        hld-mul
+        hld-div
+        hld-min
+        hld-max
+        hld-eq-int
+        hld-eq-bool
+        hld-lt
+        hld-and
+        hld-or
+        hld-not
+        hld-select-int
+        hld-select-bool))
+
+(struct hld-int (indet const val) #:transparent)
+
+(define indeterminate (hld-int #t #f 0))
 
 (define (hld-op op i1 i2)
   (if (or (hld-int-indet i1) (hld-int-indet i2))
       indeterminate
-      (hld-int #f (op (hld-int-val i1) (hld-int-val i2)))))
+      (hld-int #f #f (op (hld-int-val i1) (hld-int-val i2)))))
 
 (define (hld-add i1 i2)
   (hld-op + i1 i2))
@@ -91,3 +112,7 @@
 
 (define (hld-eq-bool b1 b2)
   (or (and b1 b2) (nor b1 b2)))
+
+;; fold semantically does nothing, but is important for ordering
+(define (hld-fold i1)
+  i1)
