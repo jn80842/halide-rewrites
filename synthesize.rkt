@@ -10,7 +10,7 @@
          (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
                [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
            (begin
-             (define binding (time (synthesize #:forall (harvest inputs)
+             (define binding (time (synthesize #:forall (symbolics inputs)
                                                #:guarantee (assert (and (expr-greater-than LHS RHS-sketch)
                                                                         (equal? evaled-LHS evaled-RHS))))))
              (clear-asserts!)

@@ -14,12 +14,6 @@
   (define-symbolic* b boolean?)
   b)
 
-(define (harvest input-list)
-  (for/list ([i (range (length input-list))])
-    (if (hld-int? (list-ref input-list i))
-        (hld-int-val (list-ref input-list i))
-        (list-ref input-list i))))
-
 ;; a halide expression sketch is a list of instructions and a return value
 ;; each instruction has an operator index and indices of the operator's arguments
 ;; the return value is the index of the register whose value should be returned

@@ -26,6 +26,14 @@
 ;;         | WildBool
 ;;         | Bool;
 
+;; non-rewrite rule rewrites:
+;; a <= b --> ! b > a
+;; a > b  --> b > a
+;; a >= b --> ! a < b
+;; a != b --> ! a == b
+;; a == b --> a - b == 0
+;; - a    --> 0 - a
+
 (provide (all-defined-out))
 
 (define (div-in-Z-val x y)
@@ -62,12 +70,12 @@
   (hld-op * i1 i2))
 
 (define (hld-div i1 i2)
-  (if (= i2 0)
+  (if (= (hld-int-val i2) 0)
       indeterminate
       (hld-op euclidean-div i1 i2)))
 
 (define (hld-mod i1 i2)
-  (if (= i2 0)
+  (if (= (hld-int-val i2) 0)
       indeterminate
       (hld-op euclidean-mod i1 i2)))
 
@@ -78,21 +86,31 @@
   (hld-op min i1 i2))
 
 (define (hld-select-int b1 i1 i2)
-  (if b1 i1 i2))
+  (if (boolean? b1)
+      (if b1 i1 i2)
+      'failed-typecheck))
 
 (define (hld-select-bool b1 b2 b3)
-  (if b1 b2 b3))
+  (if (and (boolean? b1) (boolean? b2) (boolean? b3))
+      (if b1 b2 b3)
+      'failed-typecheck))
 
 ;; ramp and broadcast
 
 (define (hld-not b)
-  (not b))
+  (if (boolean? b)
+      (not b)
+      'failed-typecheck))
 
 (define (hld-and b1 b2)
-  (and b1 b2))
+  (if (and (boolean? b1) (boolean? b2))
+      (and b1 b2)
+      'failed-typecheck))
 
 (define (hld-or b1 b2)
-  (or b1 b2))
+  (if (and (boolean? b1) (boolean? b2))
+      (or b1 b2)
+      'failed-typecheck))
 
 (define (hld-lt i1 i2)
   (if (or (hld-int-indet i1) (hld-int-indet i2))
@@ -105,7 +123,9 @@
       (= i1 i2)))
 
 (define (hld-eq-bool b1 b2)
-  (or (and b1 b2) (nor b1 b2)))
+  (if (and (boolean? b1) (boolean? b2))
+      (or (and b1 b2) (nor b1 b2))
+      'failed-typecheck))
 
 ;; fold semantically does nothing, but is important for ordering
 (define (hld-fold i1)
@@ -121,7 +141,7 @@
 (define min-operator (operator hld-min 2 "hld-min"))
 (define max-operator (operator hld-max 2 "hld-max"))
 (define eq-int-operator (operator hld-eq-int 2 "hld-eq-int"))
-(define eq-bool-operator (operator hld-eq-bool 2 "hld-ep-bool"))
+(define eq-bool-operator (operator hld-eq-bool 2 "hld-eq-bool"))
 (define lt-operator (operator hld-lt 2 "hld-lt"))
 (define and-operator (operator hld-and 2 "hld-and"))
 (define or-operator (operator hld-or 2 "hld-or"))
