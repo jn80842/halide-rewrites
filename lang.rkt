@@ -146,3 +146,20 @@
                   1 ;; not
                   3 ;; select int
                   3) idx))
+
+(define (get-operator-name idx)
+  (list-ref (list "hld-add"
+                  "hld-sub"
+                  "hld-mod"
+                  "hld-mul"
+                  "hld-div"
+                  "hld-min"
+                  "hld-max"
+                  "hld-eq-int"
+                  "hld-eq-bool"
+                  "hld-lt"
+                  "hld-and"
+                  "hld-or"
+                  "hld-not"
+                  "hld-select-int"
+                  "hld-select-bool") idx))
