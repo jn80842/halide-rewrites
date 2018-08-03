@@ -61,6 +61,9 @@
           (insns->string-list sk)
           (list (format "  R~a)" (sketch-retval-idx sk)))))
 
+(define (print-sketch sk)
+  (display (string-join (sketch->string sk) "\n")))
+
 (define (get-sym-insn)
   (define-symbolic* op integer?)
   (define-symbolic* arg1 integer?)
