@@ -111,55 +111,48 @@
 (define (hld-fold i1)
   i1)
 
+(struct operator (function arity name) #:transparent)
+
+(define add-operator (operator hld-add 2 "hld-add"))
+(define sub-operator (operator hld-sub 2 "hld-sub"))
+(define mod-operator (operator hld-mod 2 "hld-mod"))
+(define mul-operator (operator hld-mul 2 "hld-mul"))
+(define div-operator (operator hld-div 2 "hld-div"))
+(define min-operator (operator hld-min 2 "hld-min"))
+(define max-operator (operator hld-max 2 "hld-max"))
+(define eq-int-operator (operator hld-eq-int 2 "hld-eq-int"))
+(define eq-bool-operator (operator hld-eq-bool 2 "hld-ep-bool"))
+(define lt-operator (operator hld-lt 2 "hld-lt"))
+(define and-operator (operator hld-and 2 "hld-and"))
+(define or-operator (operator hld-or 2 "hld-or"))
+(define not-operator (operator hld-not 1 "hld-not"))
+(define select-int-operator (operator hld-select-int 3 "hld-select-int"))
+(define select-bool-operator (operator hld-select-bool 3 "hld-select-bool"))
+
 ;; operators are in ascending strength order
 ;; chose an arbitrary ordering for the overloaded operators
 (define operator-list
-  (list hld-add ;; 0
-        hld-sub ;; 1
-        hld-mod ;; 2
-        hld-mul ;; 3
-        hld-div ;; 4
-        hld-min ;; 5
-        hld-max ;; 6
-        hld-eq-int ;; 7
-        hld-eq-bool ;; 8
-        hld-lt ;; 9
-        hld-and ;; 10
-        hld-or ;; 11
-        hld-not ;; 12
-        hld-select-int ;; 13
-        hld-select-bool)) ;; 14
+  (list add-operator ;; 0
+        sub-operator ;; 1
+        mod-operator ;; 2
+        mul-operator ;; 3
+        div-operator ;; 4
+        min-operator ;; 5
+        max-operator ;; 6
+        eq-int-operator ;; 7
+        eq-bool-operator ;; 8
+        lt-operator ;; 9
+        and-operator ;; 10
+        or-operator ;; 11
+        not-operator ;; 12
+        select-int-operator ;; 13
+        select-bool-operator)) ;; 14
 
-(define (get-arity-by-idx idx)
-  (list-ref (list 2 ;; add
-                  2 ;; sub
-                  2 ;; mod
-                  2 ;; mul
-                  2 ;; div
-                  2 ;; min
-                  2 ;; max
-                  2 ;; eq int
-                  2 ;; eq bool
-                  2 ;; lt
-                  2 ;; and
-                  2 ;; or
-                  1 ;; not
-                  3 ;; select int
-                  3) idx))
-
-(define (get-operator-name idx)
-  (list-ref (list "hld-add"
-                  "hld-sub"
-                  "hld-mod"
-                  "hld-mul"
-                  "hld-div"
-                  "hld-min"
-                  "hld-max"
-                  "hld-eq-int"
-                  "hld-eq-bool"
-                  "hld-lt"
-                  "hld-and"
-                  "hld-or"
-                  "hld-not"
-                  "hld-select-int"
-                  "hld-select-bool") idx))
+(define (get-operator-by-idx idx)
+  (list-ref operator-list idx))
+(define (get-operator-arity-by-idx idx)
+  (operator-arity (get-operator-by-idx idx)))
+(define (get-operator-name-by-idx idx)
+  (operator-name (get-operator-by-idx idx)))
+(define (get-operator-function-by-idx idx)
+  (operator-function (get-operator-by-idx idx)))

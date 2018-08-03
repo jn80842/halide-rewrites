@@ -27,8 +27,8 @@
 (struct insn (op-idx arg1-idx arg2-idx arg3-idx) #:transparent)
 
 (define (call-insn i registers)
-  (let ([arity (get-arity-by-idx (insn-op-idx i))]
-        [op-func (list-ref operator-list (insn-op-idx i))])
+  (let ([arity (get-operator-arity-by-idx (insn-op-idx i))]
+        [op-func (get-operator-function-by-idx (insn-op-idx i))])
     (case arity
       [(1) (op-func (list-ref registers (insn-arg1-idx i)))]
       [(2) (op-func (list-ref registers (insn-arg1-idx i)) (list-ref registers (insn-arg2-idx i)))]
@@ -44,7 +44,7 @@
       (format "  (define R~a ~a)" i (list-ref args i)))))
 
 (define (insn-args->string i)
-  (case (get-arity-by-idx (insn-op-idx i))
+  (case (get-operator-arity-by-idx (insn-op-idx i))
     [(1) (format "R~a" (number->string (insn-arg1-idx i)))]
     [(2) (format "R~a R~a" (number->string (insn-arg1-idx i)) (number->string (insn-arg2-idx i)))]
     [(3) (format "R~a R~a R~a" (number->string (insn-arg1-idx i)) (number->string (insn-arg2-idx i)) (number->string (insn-arg3-idx i)))]))
@@ -53,7 +53,7 @@
   (let ([input-offset (+ (sketch-nc-input-count sk) (sketch-const-input-count sk))])
     (for/list ([i (range (length (sketch-insn-list sk)))])
       (let ([current-insn (list-ref (sketch-insn-list sk) i)])
-        (format "  (define R~a (~a ~a))" (+ input-offset i) (get-operator-name (insn-op-idx current-insn)) (insn-args->string current-insn))))))
+        (format "  (define R~a (~a ~a))" (+ input-offset i) (get-operator-name-by-idx (insn-op-idx current-insn)) (insn-args->string current-insn))))))
 
 (define (sketch->string sk)
   (append (list (format "(define (sketch-function ~a)" (string-join (args->string-list sk) " ")))
