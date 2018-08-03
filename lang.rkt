@@ -28,6 +28,21 @@
 
 (provide (all-defined-out))
 
+(define (div-in-Z-val x y)
+  (if (= (modulo x y) 0) 0 1))
+
+(define (euclidean-div x y)
+  (cond [(and (negative? x) (negative? y)) (+ (- (quotient (abs x) y)) (div-in-Z-val x y))]
+        [(negative? x) (- (- (quotient (abs x) y)) (div-in-Z-val x y)) ]
+        [(negative? y) (quotient x y)]
+        [else (quotient x y)]))
+
+(define (euclidean-mod x y)
+  (cond [(and (negative? x) (negative? y)) (- (- (modulo (abs x) (abs y))) (* y (div-in-Z-val x y)))]
+        [(negative? x) (+ (- (modulo (abs x) y)) (* y (div-in-Z-val x y)))]
+        [(negative? y) (modulo x (abs y))]
+        [else (modulo x y)]))
+
 (struct hld-int (indet const val) #:transparent)
 
 (define indeterminate (hld-int #t #f 0))
@@ -46,17 +61,15 @@
 (define (hld-mul i1 i2)
   (hld-op * i1 i2))
 
-;; note that this is not euclidean!
 (define (hld-div i1 i2)
   (if (= i2 0)
       indeterminate
-      (hld-op quotient i1 i2)))
+      (hld-op euclidean-div i1 i2)))
 
-;; note that this is not euclidean!
 (define (hld-mod i1 i2)
   (if (= i2 0)
       indeterminate
-      (hld-op modulo i1 i2)))
+      (hld-op euclidean-mod i1 i2)))
 
 (define (hld-max i1 i2)
   (hld-op max i1 i2))
