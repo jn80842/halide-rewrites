@@ -86,7 +86,7 @@
   (hld-op min i1 i2))
 
 (define (hld-select-int b1 i1 i2)
-  (if (boolean? b1)
+  (if (and (boolean? b1) (hld-int? i1) (hld-int? i2))
       (if b1 i1 i2)
       'failed-typecheck))
 
@@ -120,7 +120,7 @@
 (define (hld-eq-int i1 i2)
   (if (or (hld-int-indet i1) (hld-int-indet i2))
       indeterminate
-      (= i1 i2)))
+      (equal? i1 i2)))
 
 (define (hld-eq-bool b1 b2)
   (if (and (boolean? b1) (boolean? b2))
