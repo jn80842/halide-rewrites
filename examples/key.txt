@@ -1,0 +1,6 @@
+1. (0 - x) / 2 <= (1 - x) / 2 -- evals to true, not true when constants are wild
+2. !((0 < v0) && (min((v1 + 12), v2) < (min((v1 + 20), v2) + -144))) -- evals to true, not true when constants are wild
+3. (((0 - ((v0 + 7) % 136))/136) == -1)
+4. -1 < v0 || v0 < -1 -- simplifies to v0 != -1
+5. ((-1 < v0) || (v0 < -10)) -- can't simplify
+6. -1 < x || (x + y) < y

@@ -15,6 +15,16 @@
                  (displayln "LHS is true")
                  (displayln "LHS is not provably true"))))))
 
+(define (verify-bool-expr-false LHS . inputs)
+  (begin (clear-asserts!)
+         (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)])
+           (begin
+             (define binding (time (verify (assert (not evaled-LHS)))))
+             (clear-asserts!)
+             (if (unsat? binding)
+                 (displayln "LHS is true")
+                 (displayln "LHS is not provably true"))))))
+
 (define (synth-rewrite RHS-sketch LHS . inputs)
   (begin (clear-asserts!)
          (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
