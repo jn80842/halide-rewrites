@@ -33,11 +33,18 @@
 (define RHS-sketch (get-symbolic-sketch 6 1 3))
 
 (define x (get-sym-hld-int))
-;(define zero (hld-int #f #f 0))
+(define c-zero (hld-int #f #f 0))
 (define zero (get-sym-hld-int))
-;(define one (hld-int #f #f 1))
+(define c-one (hld-int #f #f 1))
 (define one (get-sym-hld-int))
-;(define two (hld-int #f #f 2))
+(define c-two (hld-int #f #f 2))
 (define two (get-sym-hld-int))
 
-(synth-rewrite RHS-sketch LHS x zero one two)
+;(synth-rewrite RHS-sketch LHS x zero one two)
+
+#;(let ([evaled-LHS ((get-sketch-function LHS) x zero one two)]
+      [evaled-concrete-conditions ((get-sketch-function RHS-sketch) x (hld-int #f #f 0) (hld-int #f #f 1) (hld-int #f #f 2))]
+      [evaled-conditions ((get-sketch-function RHS-sketch) x zero one two)])
+  (synthesize #:forall (symbolics (list x zero one two))
+              #:guarantee (assert (and ((get-sketch-function LHS) x zero one two)
+                                     ((get-sketch-function RHS-sketch) x zero one two)))))

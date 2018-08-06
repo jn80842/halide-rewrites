@@ -9,7 +9,7 @@
   (begin (clear-asserts!)
          (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)])
            (begin
-             (define binding (verify (assert evaled-LHS)))
+             (define binding (time (verify (assert evaled-LHS))))
              (clear-asserts!)
              (if (unsat? binding)
                  (displayln "LHS is true")
