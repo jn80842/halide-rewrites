@@ -168,6 +168,22 @@
         select-int-operator ;; 13
         select-bool-operator)) ;; 14
 
+(define add-idx 0)
+(define sub-idx 1)
+(define mod-idx 2)
+(define mul-idx 3)
+(define div-idx 4)
+(define min-idx 5)
+(define max-idx 6)
+(define eq-int-idx 7)
+(define eq-bool-idx 8)
+(define lt-idx 9)
+(define and-idx 10)
+(define or-idx 11)
+(define not-idx 12)
+(define select-int-idx 13)
+(define select-bool-idx 14)
+
 (define (get-operator-by-idx idx)
   (list-ref operator-list idx))
 (define (get-operator-arity-by-idx idx)
