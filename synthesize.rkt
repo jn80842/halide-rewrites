@@ -2,6 +2,9 @@
 
 (require "sketch.rkt")
 (require "ordering.rkt")
+(require "parsers/parser.rkt")
+(require "parsers/mask-constants.rkt")
+(require "parsers/halide-dsl.rkt")
 
 (provide (all-defined-out))
 
@@ -38,4 +41,17 @@
                  (displayln "no solution found")
                  (displayln (print-sketch (evaluate RHS-sketch binding))))))))
 
+(define (verify-testcase s)
+  (let* ([sym-vars (for/list ([i (range (get-variable-count s))]) (get-sym-hld-int))]
+         [var-hash (build-var-lookup "v" sym-vars)]
+         [p (parser-to-hld-dsl #f var-hash (make-hash '()))]
+         [model (time (verify (assert (evaluate-parser p s))))])
+    (unsat? model)))
 
+(define (verify-wild-constants-testcase s)
+  (let* ([sym-vars (for/list ([i (range (get-variable-count s))]) (get-sym-hld-int))]
+         [sym-consts (for/list ([i (range (get-constant-count s))]) (get-sym-hld-int))]
+         [var-hash (build-var-lookup "v" sym-vars)]
+         [const-hash (build-var-lookup "c" sym-consts)]
+         [p (parser-to-hld-dsl #t var-hash const-hash)])
+    (unsat? model)))

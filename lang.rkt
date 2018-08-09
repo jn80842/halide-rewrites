@@ -85,6 +85,11 @@
 (define (hld-min i1 i2)
   (hld-op min i1 i2))
 
+;; untyped select that assumes b1 is boolean
+;; in Racket everything that isn't #f is true; could conflict with C truthy values
+(define (hld-select b1 i1 i2)
+  (if b1 i1 i2))
+
 (define (hld-select-int b1 i1 i2)
   (if (and (boolean? b1) (hld-int? i1) (hld-int? i2))
       (if b1 i1 i2)
@@ -127,6 +132,9 @@
       (or (and b1 b2) (nor b1 b2))
       'failed-typecheck))
 
+(define (hld-negate i1)
+  (hld-sub (hld-int #f #f 0) i1))
+
 ;; fold semantically does nothing, but is important for ordering
 (define (hld-fold i1)
   i1)
@@ -148,6 +156,7 @@
 (define not-operator (operator hld-not 1 "hld-not"))
 (define select-int-operator (operator hld-select-int 3 "hld-select-int"))
 (define select-bool-operator (operator hld-select-bool 3 "hld-select-bool"))
+(define negate-operator (operator hld-negate 1 "hld-negate"))
 
 ;; operators are in ascending strength order
 ;; chose an arbitrary ordering for the overloaded operators
@@ -166,7 +175,8 @@
         or-operator ;; 11
         not-operator ;; 12
         select-int-operator ;; 13
-        select-bool-operator)) ;; 14
+        select-bool-operator
+        negate-operator)) ;; 14
 
 (define add-idx 0)
 (define sub-idx 1)
@@ -183,6 +193,7 @@
 (define not-idx 12)
 (define select-int-idx 13)
 (define select-bool-idx 14)
+(define negate-idx 15)
 
 (define (get-operator-by-idx idx)
   (list-ref operator-list idx))

@@ -6,13 +6,20 @@
 
 (require "parser.rkt")
 
-(define constants-hash (make-hash))
+(provide masked-constants get-variable-count get-constant-count)
+
+(define wild-constants-hash (make-hash))
+(define variable-set (mutable-set))
 
 (define (get-wild-constant h const)
   (let ([count (length (hash-keys h))])
     (hash-ref h const (λ () (let ([const-var (string-append "c" (number->string count))])
                               (begin (hash-set! h const const-var)
                                      const-var))))))
+
+(define (build-variable-set s v)
+  (set-add! s v)
+  v)
 
 (define string-with-masked-constants
   (parser
@@ -34,8 +41,8 @@
            [(error start) $2]
            [(exp) $1])
 
-    (exp [(NUM) (get-wild-constant constants-hash $1)]
-         [(VAR) $1]
+    (exp [(NUM) (get-wild-constant wild-constants-hash $1)]
+         [(VAR) (build-variable-set variable-set $1)]
          [(MAX OP exp COMMA exp CP) (format "max(~a,~a)" $3 $5)]
          [(MIN OP exp COMMA exp CP) (format "min(~a,~a)" $3 $5)]
          [(! OP exp CP) (format "!(~a)" $3)]
@@ -58,7 +65,8 @@
 (define (masked-constants s)
   (let ([ip (open-input-string s)])
     (port-count-lines! ip)
-    (string-append (string-with-masked-constants (λ () (halide-lexer ip))) " ~~~ " s "\n")))
+    (string-with-masked-constants (λ () (halide-lexer ip)))))
+   ; (string-append (string-with-masked-constants (λ () (halide-lexer ip))) " ~~~ " s "\n")))
 
 (define (test-parsing in-file)
   (for-each (λ (s) (begin
@@ -66,10 +74,20 @@
                      (masked-constants s)))
             (file->lines in-file)))
 
+(define (get-variable-count s)
+  (set-clear! variable-set)
+  (masked-constants s)
+  (set-count variable-set))
+
+(define (get-constant-count s)
+  (hash-clear! wild-constants-hash)
+  (masked-constants s)
+  (hash-count wild-constants-hash))
+
 (call-with-output-file "/Users/jnewcomb/testcases/08_02_2018/processed_part5.txt" #:exists 'append
   (λ (out)
     (for-each (λ (s) (begin
-                       (hash-clear! constants-hash)
+                       (hash-clear! wild-constants-hash)
                        (write-string (masked-constants s) out)))
               (file->lines "/Users/jnewcomb/testcases/08_02_2018/part5.txt"))))
 

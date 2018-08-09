@@ -8,7 +8,7 @@
          parser-tools/lex
          (prefix-in : parser-tools/lex-sre))
 
-(provide halide-lexer value-tokens op-tokens)
+(provide halide-lexer evaluate-parser value-tokens op-tokens)
 
 (define-tokens value-tokens (NUM VAR))
 (define-empty-tokens op-tokens (newline OP CP COMMA + - * / % ^ < > ! EQ GE LE EOF NEG OR AND MAX MIN SELECT))
@@ -51,7 +51,7 @@
    [(:: (:+ digit) #\. (:* digit)) (token-NUM (string->number lexeme))]))
 
 
-(define calcp
+(define parser-to-racket
   (parser
 
    (start start)
@@ -77,12 +77,10 @@
     
     (exp [(NUM) $1]
          [(VAR) (hash-ref vars $1 (lambda () 0))]
-        ; [(VAR = exp) (begin (hash-set! vars $1 $3)
-        ;                     $3)]
          [(exp EQ exp) (equal? $1 $3)]
          [(MAX OP exp COMMA exp CP) (max $3 $5)]
          [(MIN OP exp COMMA exp CP) (min $3 $5)]
-         [(! OP exp CP) (not $3)] ;; note that calc below doesn't print the value false
+         [(! OP exp CP) (not $3)]
          [(SELECT OP exp COMMA exp COMMA exp CP) (if $3 $5 $7)]
          [(exp AND exp) (and $1 $3)]
          [(exp OR exp) (or $1 $3)]
@@ -98,16 +96,7 @@
          [(- exp) (prec NEG) (- $2)]
          [(OP exp CP) $2]))))
 
-           
-;; run the calculator on the given input-port       
-(define (calc ip)
-  (port-count-lines! ip)
-  (letrec ((one-line
-	    (lambda ()
-	      (let ((result (calcp (lambda () (halide-lexer ip)))))
-		(when result
-                  (printf "~a\n" result)
-                  (one-line))))))
-    (one-line)))
-
-;(calc (open-input-string "x=1\n(x + 2 * 3) - (1+2)*3"))
+(define (evaluate-parser p s)
+  (let ([ip (open-input-string s)])
+    (port-count-lines! ip)
+    (p (λ () (halide-lexer ip)))))
