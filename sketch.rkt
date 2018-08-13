@@ -55,8 +55,43 @@
           (insns->string-list sk)
           (list (format "  R~a)" (sketch-retval-idx sk)))))
 
+(define (live-reg-sketch->string sk)
+  (let ([live-regs (find-live-registers sk)]
+        [input-count (+ (sketch-nc-input-count sk) (sketch-const-input-count sk))]
+        [input-strings (inputs->string-list sk)]
+        [insn-strings (insns->string-list sk)])
+    (append (list (format "(define (sketch-function ~a)" (string-join (args->string-list sk) " ")))
+            (filter identity (map (λ (x) (if (member x live-regs)
+                                             (list-ref input-strings x)
+                                             #f))
+                                  (range input-count)))
+            (filter identity (map (λ (x) (if (member x live-regs)
+                                             (list-ref insn-strings (- x input-count))
+                                             #f))
+                                  (range input-count (+ input-count (length (sketch-insn-list sk))))))
+            (list (format "  R~a)" (sketch-retval-idx sk))))))
+
+(define (find-referenced-registers i)
+  (let ([arity (get-operator-arity-by-idx (insn-op-idx i))])
+    (case arity
+      [(1) (list (insn-arg1-idx i))]
+      [(2) (list (insn-arg1-idx i) (insn-arg2-idx i))]
+      [(3) (list (insn-arg1-idx i) (insn-arg2-idx i) (insn-arg3-idx i))])))
+
+(define (find-live-registers sk)
+  (let ([input-count (+ (sketch-nc-input-count sk) (sketch-const-input-count sk))])
+    (letrec ([f (λ (unprocessed-idx live-regs)
+                  (cond [(empty? unprocessed-idx) live-regs]
+                        [(< (first unprocessed-idx) input-count) (f (cdr unprocessed-idx) (append (list (first unprocessed-idx)) live-regs))]
+                        [else (f (append (cdr unprocessed-idx) (find-referenced-registers (list-ref (sketch-insn-list sk) (- (first unprocessed-idx) input-count))))
+                                 (cons (first unprocessed-idx) live-regs))]))])
+      (f (list (sketch-retval-idx sk)) '()))))
+
 (define (print-sketch sk)
-  (display (string-join (sketch->string sk) "\n")))
+  (displayln (string-join (sketch->string sk) "\n")))
+
+(define (print-live-regs-sketch sk)
+  (displayln (string-join (live-reg-sketch->string sk) "\n")))
 
 (define (get-sym-insn)
   (define-symbolic* op integer?)

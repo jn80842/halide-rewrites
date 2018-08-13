@@ -41,7 +41,7 @@
              (clear-asserts!)
              (if (unsat? binding)
                  (displayln "no solution found")
-                 (displayln (print-sketch (evaluate RHS-sketch binding))))))))
+                 (print-live-regs-sketch (evaluate RHS-sketch binding)))))))
 
 (define (synth-rewrite-from-testcase testcase)
   (let* ([var-count (get-variable-count testcase)]
@@ -61,7 +61,7 @@
           (clear-asserts!)
           (if (unsat? binding)
               (displayln "no solution found")
-              (displayln (print-sketch (evaluate RHS-sketch binding)))))))))
+              (print-live-regs-sketch (evaluate RHS-sketch binding))))))))
 
 (define (verify-testcase s)
   (let* ([sym-vars (for/list ([i (range (get-variable-count s))]) (get-sym-hld-int))]
