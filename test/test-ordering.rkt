@@ -30,3 +30,7 @@
 (check-true (expr-greater-than x+c0*x+c0 x+c0/c1))
 (check-true (expr-greater-than x+c0/c1 x+c0*c1))
 (check-true (expr-greater-than x+c0*x+c0 x+c0*c1))
+
+(check-true (ordering-greater-than (get-sketch-ordering x+c0*x+c0) (get-sketch-ordering x+c0/c1)))
+(check-true (ordering-greater-than (get-sketch-ordering x+c0/c1) (get-sketch-ordering x+c0*c1)))
+(check-true (ordering-greater-than (get-sketch-ordering x+c0*x+c0) (get-sketch-ordering x+c0*c1)))

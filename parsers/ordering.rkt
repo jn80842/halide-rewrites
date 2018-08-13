@@ -31,7 +31,7 @@
            [(exp) $1])
 
     (exp [(NUM) '()]
-         [(VAR) 'var]
+         [(VAR) $1]
          [(MAX OP exp COMMA exp CP) (list max-idx $3 $5)]
          [(MIN OP exp COMMA exp CP) (list min-idx $3 $5)]
          [(! OP exp CP) (list not-idx $3)]
@@ -52,9 +52,11 @@
          [(OP exp CP) $2]))))
 
 (define (find-ordering s)
-  (let ([order (get-new-ordering)])
-    (for-each (λ (elt) (if (eq? 'var elt)
-                           (increment-ordering-nc-count order)
+  (let ([order (get-new-ordering)]
+        [var-hash (make-hash '())])
+    (for-each (λ (elt) (if (symbol? elt)
+                           (hash-set! var-hash elt 0)
                            (increment-ordering-operator order elt)))
               (flatten (evaluate-parser parser-to-ordering s)))
+    (set-ordering-nc-count! order (hash-count var-hash))
     order))

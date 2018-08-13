@@ -5,6 +5,8 @@
 (require "parsers/parser.rkt")
 (require "parsers/mask-constants.rkt")
 (require "parsers/halide-dsl.rkt")
+(require "parsers/insn-node-count.rkt")
+(require "parsers/ordering.rkt")
 
 (provide (all-defined-out))
 
@@ -40,6 +42,26 @@
              (if (unsat? binding)
                  (displayln "no solution found")
                  (displayln (print-sketch (evaluate RHS-sketch binding))))))))
+
+(define (synth-rewrite-from-testcase testcase)
+  (let* ([var-count (get-variable-count testcase)]
+       ;  [const-count (get-constant-count testcase)]
+         [insn-count (get-insn-node-count testcase)]
+         [sym-var-list (for/list ([i (range var-count)]) (get-sym-hld-int))]
+       ;  [sym-const-list (for/list ([i (range const-count)]) (get-sym-hld-int))]
+         [RHS-sketch (get-symbolic-sketch insn-count var-count 0)])
+    (begin
+      (clear-asserts!)
+      (let ([evaled-LHS (evaluate-parser (parser-to-hld-dsl #f (build-var-lookup "v" sym-var-list) (make-hash '())) testcase)]
+            [evaled-RHS (apply (get-sketch-function RHS-sketch) sym-var-list)])
+        (begin
+          (define binding (time (synthesize #:forall (symbolics sym-var-list)
+                                            #:guarantee (assert (and (ordering-greater-than-sketch (find-ordering testcase) RHS-sketch)
+                                                                     (equal? evaled-LHS evaled-RHS))))))
+          (clear-asserts!)
+          (if (unsat? binding)
+              (displayln "no solution found")
+              (displayln (print-sketch (evaluate RHS-sketch binding)))))))))
 
 (define (verify-testcase s)
   (let* ([sym-vars (for/list ([i (range (get-variable-count s))]) (get-sym-hld-int))]
