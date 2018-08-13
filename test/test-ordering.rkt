@@ -25,8 +25,6 @@
 (check-eq? (expr-nonconst-count x+c0/c1) 1)
 (check-eq? (expr-nonconst-count x+c0*x+c0) 2)
 
-(check-true (histo-greater-than x+c0/c1 x+c0*c1))
-
 (check-true (expr-greater-than x+c0*x+c0 x+c0/c1))
 (check-true (expr-greater-than x+c0/c1 x+c0*c1))
 (check-true (expr-greater-than x+c0*x+c0 x+c0*c1))
