@@ -83,3 +83,5 @@
      ; (histo-greater-than sk1 sk2)
       ;; lpo
       ))
+
+(define minimum-ordered-sketch (sketch '() 0 1 0))

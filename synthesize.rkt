@@ -43,6 +43,20 @@
                  (displayln "no solution found")
                  (print-live-regs-sketch (evaluate RHS-sketch binding)))))))
 
+(define (synth-rewrite-to-ordering RHS-sketch LHS min-sketch . inputs)
+  (begin (clear-asserts!)
+         (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
+               [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
+           (begin
+             (define binding (time (synthesize #:forall (symbolics inputs)
+                                               #:guarantee (assert (and (expr-greater-than LHS RHS-sketch)
+                                                                        (expr-greater-than RHS-sketch min-sketch)
+                                                                        (equal? evaled-LHS evaled-RHS))))))
+             (clear-asserts!)
+             (if (unsat? binding)
+                 (displayln "no solution found")
+                 (print-live-regs-sketch (evaluate RHS-sketch binding)))))))
+
 (define (synth-rewrite-from-testcase testcase)
   (let* ([var-count (get-variable-count testcase)]
        ;  [const-count (get-constant-count testcase)]
