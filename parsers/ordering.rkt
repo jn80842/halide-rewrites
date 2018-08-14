@@ -51,7 +51,7 @@
          [(- exp) (list negate-idx $2)]
          [(OP exp CP) $2]))))
 
-(define (find-ordering s)
+#;(define (find-ordering s)
   (let ([order (get-new-ordering)]
         [var-hash (make-hash '())])
     (for-each (λ (elt) (if (symbol? elt)
@@ -60,3 +60,12 @@
               (flatten (evaluate-parser parser-to-ordering s)))
     (set-ordering-nc-count! order (hash-count var-hash))
     order))
+
+(define (find-ordering s)
+  (let ([var-hash (make-hash '())]
+        [op-hash (make-hash (map (λ (i) (cons i 0)) (range (length operator-list))))])
+    (for-each (λ (elt) (if (symbol? elt)
+                           (hash-set! var-hash elt 0)
+                           (hash-set! op-hash elt (add1 (hash-ref op-hash elt)))))
+              (flatten (evaluate-parser parser-to-ordering s)))
+    (ordering (hash-count var-hash) (map (λ (i) (hash-ref op-hash i)) (range (length operator-list))))))

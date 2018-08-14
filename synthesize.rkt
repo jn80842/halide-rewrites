@@ -36,7 +36,7 @@
                [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
            (begin
              (define binding (time (synthesize #:forall (symbolics inputs)
-                                               #:guarantee (assert (and (expr-greater-than LHS RHS-sketch)
+                                               #:guarantee (assert (and (sketch-ordering-greater-than LHS RHS-sketch)
                                                                         (equal? evaled-LHS evaled-RHS))))))
              (clear-asserts!)
              (if (unsat? binding)
@@ -49,8 +49,8 @@
                [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
            (begin
              (define binding (time (synthesize #:forall (symbolics inputs)
-                                               #:guarantee (assert (and (expr-greater-than LHS RHS-sketch)
-                                                                        (expr-greater-than RHS-sketch min-sketch)
+                                               #:guarantee (assert (and (sketch-ordering-greater-than LHS RHS-sketch)
+                                                                        (sketch-ordering-greater-than RHS-sketch min-sketch)
                                                                         (equal? evaled-LHS evaled-RHS))))))
              (clear-asserts!)
              (if (unsat? binding)
