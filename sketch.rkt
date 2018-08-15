@@ -18,7 +18,7 @@
 ;; each instruction has an operator index and indices of the operator's arguments
 ;; the return value is the index of the register whose value should be returned
 
-(struct insn (op-idx arg1-idx arg2-idx arg3-idx) #:transparent)
+(struct insn (op-idx arg1-idx arg2-idx arg3-idx var-count) #:transparent)
 
 (define (call-insn i registers)
   (let ([arity (get-operator-arity-by-idx (insn-op-idx i))]
@@ -27,6 +27,16 @@
       [(1) (op-func (list-ref registers (insn-arg1-idx i)))]
       [(2) (op-func (list-ref registers (insn-arg1-idx i)) (list-ref registers (insn-arg2-idx i)))]
       [(3) (op-func (list-ref registers (insn-arg1-idx i)) (list-ref registers (insn-arg2-idx i)) (list-ref registers (insn-arg3-idx i)))])))
+
+#;(define (get-insn-var-count i var-counts)
+  (let ([arity (get-operator-arity-by-idx (insn-op-idx i))])
+    (case arity
+      [(1) (list-ref var-counts (insn-arg1-idx i))]
+      [(2) (+ (list-ref var-counts (insn-arg1-idx i)) (list-ref var-counts (insn-arg2-idx i)))]
+      [(3) (+ (list-ref var-counts (insn-arg1-idx i)) (list-ref var-counts (insn-arg2-idx i)) (list-ref var-counts (insn-arg3-idx i)))])))
+;; let the solver choose cheap options for any unused arguments
+(define (get-insn-var-count i var-counts)
+  (+ (list-ref var-counts (insn-arg1-idx i)) (list-ref var-counts (insn-arg2-idx i)) (list-ref var-counts (insn-arg3-idx i))))
 
 (define (args->string-list sk)
   (append (for/list ([i (range (sketch-nc-input-count sk))]) (format "_~a" i))
@@ -98,7 +108,8 @@
   (define-symbolic* arg1 integer?)
   (define-symbolic* arg2 integer?)
   (define-symbolic* arg3 integer?)
-  (insn op arg1 arg2 arg3))
+  (define-symbolic* var-count integer?)
+  (insn op arg1 arg2 arg3 var-count))
 
 (struct sketch (insn-list retval-idx nc-input-count const-input-count) #:transparent)
 
@@ -106,12 +117,20 @@
   (define-symbolic* retval integer?)
   (sketch (for/list ([i (range insn-count)]) (get-sym-insn)) retval nc-input-count const-input-count))
 
+;; would it help if we unrolled this into a for foldl?
 (define (get-sketch-function sk)
   (letrec ([f (λ (calculated-regs i)
                 (cond [(equal? (length (sketch-insn-list sk)) i) calculated-regs]
                       [else (let ([next-reg (call-insn (list-ref (sketch-insn-list sk) i) calculated-regs)])
                               (f (append calculated-regs (list next-reg)) (add1 i)))]))])
     (λ inputs (list-ref (f inputs 0) (sketch-retval-idx sk)))))
+
+(define (get-variable-count-for-program sk)
+  (letrec ([f (λ (calculated-counts i)
+                (cond [(equal? (length (sketch-insn-list sk)) i) calculated-counts]
+                      [else (let ([next-reg-count (get-insn-var-count (list-ref (sketch-insn-list sk) i) calculated-counts)])
+                              (f (append calculated-counts (list next-reg-count)) (add1 i)))]))])
+    (list-ref (f (append (make-list (sketch-nc-input-count sk) 1) (make-list (sketch-const-input-count sk) 0)) 0) (sketch-retval-idx sk))))
 
 
 
