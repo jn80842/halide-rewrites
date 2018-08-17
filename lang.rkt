@@ -60,29 +60,29 @@
       indeterminate
       (hld-int #f #f (op (hld-int-val i1) (hld-int-val i2)))))
 
-(define (hld-add i1 i2)
+(define (hld-add i1 i2 i3)
   (hld-op + i1 i2))
 
-(define (hld-sub i1 i2)
+(define (hld-sub i1 i2 i3)
   (hld-op - i1 i2))
 
-(define (hld-mul i1 i2)
+(define (hld-mul i1 i2 i3)
   (hld-op * i1 i2))
 
-(define (hld-div i1 i2)
+(define (hld-div i1 i2 i3)
   (if (= (hld-int-val i2) 0)
       indeterminate
       (hld-op euclidean-div i1 i2)))
 
-(define (hld-mod i1 i2)
+(define (hld-mod i1 i2 i3)
   (if (= (hld-int-val i2) 0)
       indeterminate
       (hld-op euclidean-mod i1 i2)))
 
-(define (hld-max i1 i2)
+(define (hld-max i1 i2 i3)
   (hld-op max i1 i2))
 
-(define (hld-min i1 i2)
+(define (hld-min i1 i2 i3)
   (hld-op min i1 i2))
 
 ;; untyped select that assumes b1 is boolean
@@ -102,41 +102,45 @@
 
 ;; ramp and broadcast
 
-(define (hld-not b)
+(define (hld-not b i2 i3)
   (if (boolean? b)
       (not b)
       'failed-typecheck))
 
-(define (hld-and b1 b2)
+(define (hld-and b1 b2 i3)
   (if (and (boolean? b1) (boolean? b2))
       (and b1 b2)
       'failed-typecheck))
 
-(define (hld-or b1 b2)
+(define (hld-or b1 b2 i3)
   (if (and (boolean? b1) (boolean? b2))
       (or b1 b2)
       'failed-typecheck))
 
-(define (hld-lt i1 i2)
+(define (hld-lt i1 i2 i3)
   (if (or (hld-int-indet i1) (hld-int-indet i2))
       indeterminate
       (< (hld-int-val i1) (hld-int-val i2))))
 
-(define (hld-eq-int i1 i2)
+(define (hld-eq-int i1 i2 i3)
   (if (or (hld-int-indet i1) (hld-int-indet i2))
       indeterminate
       (equal? i1 i2)))
 
-(define (hld-eq-bool b1 b2)
+(define (hld-eq-bool b1 b2 i3)
   (if (and (boolean? b1) (boolean? b2))
       (or (and b1 b2) (nor b1 b2))
       'failed-typecheck))
 
-(define (hld-negate i1)
+(define (hld-negate i1 i2 i3)
   (hld-sub (hld-int #f #f 0) i1))
 
 ;; fold semantically does nothing, but is important for ordering
 (define (hld-fold i1)
+  i1)
+
+;; hand up the left hand side
+(define (hld-no-op i1 i2 i3)
   i1)
 
 (struct operator (function arity name) #:transparent)
@@ -157,6 +161,7 @@
 (define select-int-operator (operator hld-select-int 3 "hld-select-int"))
 (define select-bool-operator (operator hld-select-bool 3 "hld-select-bool"))
 (define negate-operator (operator hld-negate 1 "hld-negate"))
+(define noop-operator (operator hld-no-op 2 "hld-noop"))
 
 ;; operators are in ascending strength order
 ;; chose an arbitrary ordering for the overloaded operators
@@ -175,8 +180,9 @@
         or-operator ;; 11
         not-operator ;; 12
         select-int-operator ;; 13
-        select-bool-operator
-        negate-operator)) ;; 14
+        select-bool-operator ;; 14
+        negate-operator ;; 15
+        noop-operator)) ;; 16
 
 (define add-idx 0)
 (define sub-idx 1)
@@ -194,6 +200,7 @@
 (define select-int-idx 13)
 (define select-bool-idx 14)
 (define negate-idx 15)
+(define noop-idx 16)
 
 (define (get-operator-by-idx idx)
   (list-ref operator-list idx))

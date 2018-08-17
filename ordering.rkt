@@ -24,10 +24,9 @@
                              (> count1 count2))) h1 h2))))
 
 (define (get-insn-nc-counts prior-insn-counts current-insn)
-  (let ([arity (get-operator-arity-by-idx (insn-op-idx current-insn))])
-    (+ (if (>= arity 3) (list-ref prior-insn-counts (insn-arg3-idx current-insn)) 0)
-       (if (>= arity 2) (list-ref prior-insn-counts (insn-arg2-idx current-insn)) 0)
-       (list-ref prior-insn-counts (insn-arg1-idx current-insn)))))
+  (+ (list-ref prior-insn-counts (insn-arg1-idx current-insn))
+     (list-ref prior-insn-counts (insn-arg2-idx current-insn))
+     (list-ref prior-insn-counts (insn-arg3-idx current-insn))))
 
 (define (build-nonconst-counts sk)
   (let ([nc-and-const-insn-list (append (make-list (sketch-nc-input-count sk) 1)
