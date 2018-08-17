@@ -27,73 +27,6 @@
 (define (get-insn-var-count i var-counts)
   (+ (list-ref var-counts (insn-arg1-idx i)) (list-ref var-counts (insn-arg2-idx i)) (list-ref var-counts (insn-arg3-idx i))))
 
-(define (args->string-list sk)
-  (append (for/list ([i (range (sketch-nc-input-count sk))]) (format "_~a" i))
-          (for/list ([j (range (sketch-nc-input-count sk) (+ (sketch-nc-input-count sk) (sketch-const-input-count sk)))]) (format "c~a" j))
-          (list "0")))
-
-(define (inputs->string-list sk)
-  (let ([args (args->string-list sk)])
-    (for/list ([i (range (length args))])
-      (format "  (define R~a ~a)" i (list-ref args i)))))
-
-(define (insn-args->string i)
-  (case (get-operator-arity-by-idx (insn-op-idx i))
-    [(1) (format "R~a" (number->string (insn-arg1-idx i)))]
-    [(2) (format "R~a R~a" (number->string (insn-arg1-idx i)) (number->string (insn-arg2-idx i)))]
-    [(3) (format "R~a R~a R~a" (number->string (insn-arg1-idx i)) (number->string (insn-arg2-idx i)) (number->string (insn-arg3-idx i)))]))
-
-(define (insns->string-list sk)
-  (let ([input-offset (get-sketch-input-count sk)])
-    (for/list ([i (range (length (sketch-insn-list sk)))])
-      (let ([current-insn (list-ref (sketch-insn-list sk) i)])
-        (format "  (define R~a (~a ~a))" (+ input-offset i) (get-operator-name-by-idx (insn-op-idx current-insn)) (insn-args->string current-insn))))))
-
-(define (sketch->string sk)
-  (append (list (format "(define (sketch-function ~a)" (string-join (args->string-list sk) " ")))
-          (inputs->string-list sk)
-          (insns->string-list sk)
-          (list (format "  R~a)" (sketch-retval-idx sk)))))
-
-(define (live-reg-sketch->string sk)
-  (let ([args (args->string-list sk)]
-        [live-regs (find-live-registers sk)]
-        [input-count (get-sketch-input-count sk)]
-        [input-strings (inputs->string-list sk)]
-        [insn-strings (insns->string-list sk)])
-    (append (list (format "(define (sketch-function ~a)" (string-join (take args (sub1 (length args))) " ")))
-            (filter identity (map (λ (x) (if (member x live-regs)
-                                             (list-ref input-strings x)
-                                             #f))
-                                  (range input-count)))
-            (filter identity (map (λ (x) (if (member x live-regs)
-                                             (list-ref insn-strings (- x input-count))
-                                             #f))
-                                  (range input-count (+ input-count (length (sketch-insn-list sk))))))
-            (list (format "  R~a)" (sketch-retval-idx sk))))))
-
-(define (find-referenced-registers i)
-  (let ([arity (get-operator-arity-by-idx (insn-op-idx i))])
-    (case arity
-      [(1) (list (insn-arg1-idx i))]
-      [(2) (list (insn-arg1-idx i) (insn-arg2-idx i))]
-      [(3) (list (insn-arg1-idx i) (insn-arg2-idx i) (insn-arg3-idx i))])))
-
-(define (find-live-registers sk)
-  (let ([input-count (get-sketch-input-count sk)])
-    (letrec ([f (λ (unprocessed-idx live-regs)
-                  (cond [(empty? unprocessed-idx) live-regs]
-                        [(< (first unprocessed-idx) input-count) (f (cdr unprocessed-idx) (append (list (first unprocessed-idx)) live-regs))]
-                        [else (f (append (cdr unprocessed-idx) (find-referenced-registers (list-ref (sketch-insn-list sk) (- (first unprocessed-idx) input-count))))
-                                 (cons (first unprocessed-idx) live-regs))]))])
-      (f (list (sketch-retval-idx sk)) '()))))
-
-(define (print-sketch sk)
-  (displayln (string-join (sketch->string sk) "\n")))
-
-(define (print-live-regs-sketch sk)
-  (displayln (string-join (live-reg-sketch->string sk) "\n")))
-
 (define (get-sym-insn)
   (define-symbolic* op integer?)
   (define-symbolic* arg1 integer?)
@@ -110,6 +43,22 @@
 (define (get-symbolic-sketch insn-count nc-input-count const-input-count)
   (define-symbolic* retval integer?)
   (sketch (for/list ([i (range insn-count)]) (get-sym-insn)) retval nc-input-count const-input-count))
+
+(define (find-referenced-registers i)
+  (let ([arity (get-operator-arity-by-idx (insn-op-idx i))])
+    (case arity
+      [(1) (list (insn-arg1-idx i))]
+      [(2) (list (insn-arg1-idx i) (insn-arg2-idx i))]
+      [(3) (list (insn-arg1-idx i) (insn-arg2-idx i) (insn-arg3-idx i))])))
+
+(define (find-live-registers sk)
+  (let ([input-count (get-sketch-input-count sk)])
+    (letrec ([f (λ (unprocessed-idx live-regs)
+                  (cond [(empty? unprocessed-idx) live-regs]
+                        [(< (first unprocessed-idx) input-count) (f (cdr unprocessed-idx) (append (list (first unprocessed-idx)) live-regs))]
+                        [else (f (append (cdr unprocessed-idx) (find-referenced-registers (list-ref (sketch-insn-list sk) (- (first unprocessed-idx) input-count))))
+                                 (cons (first unprocessed-idx) live-regs))]))])
+      (f (list (sketch-retval-idx sk)) '()))))
 
 ;; would it help if we unrolled this into a for foldl?
 ;; potentially not since there's only 2 branches in the recursive function

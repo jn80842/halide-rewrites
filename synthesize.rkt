@@ -1,6 +1,7 @@
 #lang rosette
 
 (require "sketch.rkt")
+(require "print-sketch.rkt")
 (require "ordering.rkt")
 (require "parsers/parser.rkt")
 (require "parsers/mask-constants.rkt")
