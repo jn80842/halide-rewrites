@@ -11,16 +11,17 @@
 ;; R0 : x
 ;; R1 : y
 ;; R2 : -1
-;; R3 : R2 < R0
-;; R4 : R0 + R1
-;; R5 : R4 < R1
-;; R6 : R3 || R5
+;; R3 : 0 (dummy)
+;; R4 : R2 < R0
+;; R5 : R0 + R1
+;; R6 : R5 < R1
+;; R7 : R4 || R6
 
-(define LHS (sketch (list (insn lt-idx 2 0 0)
-                          (insn add-idx 0 1 0)
-                          (insn lt-idx 4 1 0)
-                          (insn or-idx 3 5 0))
-                    6
+(define LHS (sketch (list (insn lt-idx 2 0 2)
+                          (insn add-idx 0 1 2)
+                          (insn lt-idx 5 1 2)
+                          (insn or-idx 4 6 2))
+                    7
                     2
                     1))
 

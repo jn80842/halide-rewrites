@@ -40,6 +40,9 @@
 (define (get-sketch-input-count sk)
   (+ (sketch-nc-input-count sk) (sketch-const-input-count sk) 1))
 
+(define (get-sketch-register-count sk)
+  (+ (length (sketch-insn-list sk)) (get-sketch-input-count sk)))
+
 (define (get-symbolic-sketch insn-count nc-input-count const-input-count)
   (define-symbolic* retval integer?)
   (sketch (for/list ([i (range insn-count)]) (get-sym-insn)) retval nc-input-count const-input-count))

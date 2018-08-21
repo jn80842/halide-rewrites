@@ -40,7 +40,7 @@
 (define c-two (hld-int #f #f 2))
 (define two (get-sym-hld-int))
 
-;(synth-rewrite RHS-sketch LHS x zero one two)
+(synth-rewrite RHS-sketch LHS x zero one two)
 
 #;(let ([evaled-LHS ((get-sketch-function LHS) x zero one two)]
       [evaled-concrete-conditions ((get-sketch-function RHS-sketch) x (hld-int #f #f 0) (hld-int #f #f 1) (hld-int #f #f 2))]

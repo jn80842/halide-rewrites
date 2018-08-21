@@ -36,6 +36,9 @@
 
 (provide (all-defined-out))
 
+(define (hld-constant int)
+  (hld-int #f #f int))
+
 (define (div-in-Z-val x y)
   (if (= (modulo x y) 0) 0 1))
 
@@ -133,7 +136,7 @@
       'failed-typecheck))
 
 (define (hld-negate i1 i2 i3)
-  (hld-sub (hld-int #f #f 0) i1))
+  (hld-int #f #f (- (hld-int-val i1))))
 
 ;; fold semantically does nothing, but is important for ordering
 (define (hld-fold i1)
