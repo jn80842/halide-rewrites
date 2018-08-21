@@ -23,10 +23,6 @@
 (define (call-insn i registers)
   ((get-operator-function-by-idx (insn-op-idx i)) (list-ref registers (insn-arg1-idx i)) (list-ref registers (insn-arg2-idx i)) (list-ref registers (insn-arg3-idx i))))
 
-;; let the solver choose cheap instructions
-(define (get-insn-var-count i var-counts)
-  (+ (list-ref var-counts (insn-arg1-idx i)) (list-ref var-counts (insn-arg2-idx i)) (list-ref var-counts (insn-arg3-idx i))))
-
 (define (get-sym-insn)
   (define-symbolic* op integer?)
   (define-symbolic* arg1 integer?)
@@ -72,12 +68,6 @@
                               (f (append calculated-regs (list next-reg)) (add1 i)))]))])
     (λ inputs (list-ref (f (append inputs (list (hld-int #f #f 0))) 0) (sketch-retval-idx sk)))))
 
-(define (get-variable-count-for-program sk)
-  (letrec ([f (λ (calculated-counts i)
-                (cond [(equal? (length (sketch-insn-list sk)) i) calculated-counts]
-                      [else (let ([next-reg-count (get-insn-var-count (list-ref (sketch-insn-list sk) i) calculated-counts)])
-                              (f (append calculated-counts (list next-reg-count)) (add1 i)))]))])
-    (list-ref (f (append (make-list (sketch-nc-input-count sk) 1) (make-list (add1 (sketch-const-input-count sk)) 0)) 0) (sketch-retval-idx sk))))
 
 
 

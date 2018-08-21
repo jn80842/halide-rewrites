@@ -16,7 +16,6 @@
 
 (check-equal? (get-sketch-input-count sk1) 3)
 (check-equal? (get-sketch-register-count sk1) 4)
-(check-equal? (get-variable-count-for-program sk1) 2)
 (check-true (unsat? (verify (assert (equal? ((get-sketch-function sk1) x y) (hld-add x y #f))))))
 
 (define sk2 (sketch (list (insn lt-idx 1 0 1)
@@ -28,7 +27,6 @@
 
 (check-equal? (get-sketch-input-count sk2) 4)
 (check-equal? (get-sketch-register-count sk2) 7)
-(check-equal? (get-variable-count-for-program sk2) 2)
 (check-true (unsat? (verify (assert (equal? ((get-sketch-function sk2) x -one -ten) (hld-or (hld-lt -one x #f) (hld-lt x -ten #f) #f))))))
 
 (define sk3 (sketch (list (insn sub-idx 0 1 2))

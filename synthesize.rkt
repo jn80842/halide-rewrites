@@ -45,7 +45,7 @@
                  (displayln "no solution found")
                  (print-live-regs-sketch (evaluate RHS-sketch binding)))))))
 
-(define (synth-rewrite-to-ordering RHS-sketch LHS min-sketch . inputs)
+#;(define (synth-rewrite-to-ordering RHS-sketch LHS min-sketch . inputs)
   (begin (clear-asserts!)
          (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
                [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
@@ -59,7 +59,7 @@
                  (displayln "no solution found")
                  (print-live-regs-sketch (evaluate RHS-sketch binding)))))))
 
-(define (synth-rewrite-from-testcase testcase)
+#;(define (synth-rewrite-from-testcase testcase)
   (let* ([var-count (get-variable-count testcase)]
        ;  [const-count (get-constant-count testcase)]
          [insn-count (get-insn-node-count testcase)]
