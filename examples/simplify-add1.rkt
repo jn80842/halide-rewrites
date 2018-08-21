@@ -10,12 +10,13 @@
 
 ;; R0: x
 ;; R1: y
-;; R2: R1 - R0
-;; R3: R0 + R2
+;; R2: 0 (dummy)
+;; R3: R1 - R0
+;; R4: R0 + R3
 
-(define LHS (sketch (list (insn 1 1 0 0)
-                          (insn 0 0 2 0))
-                    3
+(define LHS (sketch (list (insn sub-idx 1 0 2)
+                          (insn add-idx 0 3 2))
+                    4
                     2
                     0))
 
@@ -24,26 +25,9 @@
 
 (define RHS-sketch (get-symbolic-sketch 2 2 0))
 
-(synth-rewrite RHS-sketch LHS x y)
-
-;; (rewrite((x - y) + (y - z), x - z)
-
-;; R0 : x
-;; R1 : y
-;; R2 : z
-;; R3 : R0 - R1
-;; R4 : R1 - R2
-;; R5 : R3 + R4
-
-(define LHS2 (sketch (list (insn sub-idx 0 1 0)
-                          (insn sub-idx 1 2 0)
-                          (insn add-idx 3 4 0))
-                    5
-                    3
-                    0))
-
-(define z (get-sym-hld-int))
-
-(define RHS-sketch2 (get-symbolic-sketch 3 3 0))
-
-(synth-rewrite RHS-sketch2 LHS2 x y z)
+(displayln "No ordering")
+(define synth1-sketch (synth-rewrite RHS-sketch LHS x y))
+(displayln "Ordering on variable count")
+(define synth2-sketch (synth-rewrite-var-counts RHS-sketch LHS x y))
+(displayln "Ordering on variable count and naive operator counts")
+(define synth3-sketch (synth-rewrite-var-and-op-counts RHS-sketch LHS x y))

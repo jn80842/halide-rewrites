@@ -169,41 +169,42 @@
 ;; operators are in ascending strength order
 ;; chose an arbitrary ordering for the overloaded operators
 (define operator-list
-  (list add-operator ;; 0
-        sub-operator ;; 1
-        mod-operator ;; 2
-        mul-operator ;; 3
-        div-operator ;; 4
-        min-operator ;; 5
-        max-operator ;; 6
-        eq-int-operator ;; 7
-        eq-bool-operator ;; 8
-        lt-operator ;; 9
-        and-operator ;; 10
-        or-operator ;; 11
-        not-operator ;; 12
-        select-int-operator ;; 13
-        select-bool-operator ;; 14
-        negate-operator ;; 15
-        noop-operator)) ;; 16
+  (list noop-operator ;; 0
+        add-operator ;; 1
+        sub-operator ;; 2
+        negate-operator ;; 3
+        mod-operator ;; 4
+        mul-operator ;; 5
+        div-operator ;; 6
+        min-operator ;; 7
+        max-operator ;; 8
+        eq-int-operator ;; 9
+        eq-bool-operator ;; 10
+        lt-operator ;; 11
+        and-operator ;; 12
+        or-operator ;; 13
+        not-operator ;; 14
+        select-int-operator ;; 15
+        select-bool-operator ;; 16
+        ))
 
-(define add-idx 0)
-(define sub-idx 1)
-(define mod-idx 2)
-(define mul-idx 3)
-(define div-idx 4)
-(define min-idx 5)
-(define max-idx 6)
-(define eq-int-idx 7)
-(define eq-bool-idx 8)
-(define lt-idx 9)
-(define and-idx 10)
-(define or-idx 11)
-(define not-idx 12)
-(define select-int-idx 13)
-(define select-bool-idx 14)
-(define negate-idx 15)
-(define noop-idx 16)
+(define noop-idx 0)
+(define add-idx 1)
+(define sub-idx 2)
+(define negate-idx 3)
+(define mod-idx 4)
+(define mul-idx 5)
+(define div-idx 6)
+(define min-idx 7)
+(define max-idx 8)
+(define eq-int-idx 9)
+(define eq-bool-idx 10)
+(define lt-idx 11)
+(define and-idx 12)
+(define or-idx 13)
+(define not-idx 14)
+(define select-int-idx 15)
+(define select-bool-idx 16)
 
 (define (get-operator-by-idx idx)
   (list-ref operator-list idx))

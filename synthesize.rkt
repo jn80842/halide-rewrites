@@ -34,16 +34,45 @@
 (define (synth-rewrite RHS-sketch LHS . inputs)
   (begin (clear-asserts!)
          (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
-               [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)]
-               [ordering (> (get-variable-count-for-program LHS) (get-variable-count-for-program RHS-sketch))])
+               [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
            (begin
              (define binding (time (synthesize #:forall (symbolics inputs)
-                                               #:guarantee (assert (and ordering
+                                               #:guarantee (assert (equal? evaled-LHS evaled-RHS)))))
+             (clear-asserts!)
+             (if (unsat? binding)
+                 (displayln "no solution found")
+                 (begin (print-live-regs-sketch (evaluate RHS-sketch binding))
+                        (evaluate RHS-sketch binding)))))))
+
+(define (synth-rewrite-var-counts RHS-sketch LHS . inputs)
+  (begin (clear-asserts!)
+         (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
+               [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
+           (begin
+             (define binding (time (synthesize #:forall (symbolics inputs)
+                                               #:guarantee (assert (and (> (get-variable-count-for-program LHS) (get-variable-count-for-program RHS-sketch))
                                                                         (equal? evaled-LHS evaled-RHS))))))
              (clear-asserts!)
              (if (unsat? binding)
                  (displayln "no solution found")
-                 (print-live-regs-sketch (evaluate RHS-sketch binding)))))))
+                 (begin (print-live-regs-sketch (evaluate RHS-sketch binding))
+                        (evaluate RHS-sketch binding)))))))
+
+(define (synth-rewrite-var-and-op-counts RHS-sketch LHS . inputs)
+  (begin (clear-asserts!)
+         (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
+               [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
+           (begin
+             (define binding (time (synthesize #:forall (symbolics inputs)
+                                               #:guarantee (assert (and (>= (get-variable-count-for-program LHS)
+                                                                           (get-variable-count-for-program RHS-sketch))
+                                                                        (sketch-histo-greater-than LHS RHS-sketch)
+                                                                        (equal? evaled-LHS evaled-RHS))))))
+             (clear-asserts!)
+             (if (unsat? binding)
+                 (displayln "no solution found")
+                 (begin (print-live-regs-sketch (evaluate RHS-sketch binding))
+                        (evaluate RHS-sketch binding)))))))
 
 #;(define (synth-rewrite-to-ordering RHS-sketch LHS min-sketch . inputs)
   (begin (clear-asserts!)
