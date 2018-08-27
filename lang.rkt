@@ -36,9 +36,6 @@
 
 (provide (all-defined-out))
 
-(define (hld-constant int)
-  (hld-int #f #f int))
-
 (define (div-in-Z-val x y)
   (if (= (modulo x y) 0) 0 1))
 
@@ -54,14 +51,8 @@
         [(negative? y) (modulo x (abs y))]
         [else (modulo x y)]))
 
-(struct hld-int (indet const val) #:transparent)
-
-(define indeterminate (hld-int #t #f 0))
-
 (define (hld-op op i1 i2)
-  (if (or (hld-int-indet i1) (hld-int-indet i2))
-      indeterminate
-      (hld-int #f #f (op (hld-int-val i1) (hld-int-val i2)))))
+  (op i1 i2))
 
 (define (hld-add i1 i2 i3)
   (hld-op + i1 i2))
@@ -73,14 +64,10 @@
   (hld-op * i1 i2))
 
 (define (hld-div i1 i2 i3)
-  (if (= (hld-int-val i2) 0)
-      indeterminate
-      (hld-op euclidean-div i1 i2)))
+  (hld-op euclidean-div i1 i2))
 
 (define (hld-mod i1 i2 i3)
-  (if (= (hld-int-val i2) 0)
-      indeterminate
-      (hld-op euclidean-mod i1 i2)))
+  (hld-op euclidean-mod i1 i2))
 
 (define (hld-max i1 i2 i3)
   (hld-op max i1 i2))
@@ -94,7 +81,7 @@
   (if b1 i1 i2))
 
 (define (hld-select-int b1 i1 i2)
-  (if (and (boolean? b1) (hld-int? i1) (hld-int? i2))
+  (if (and (boolean? b1) (integer? i1) (integer? i2))
       (if b1 i1 i2)
       'failed-typecheck))
 
@@ -121,14 +108,13 @@
       'failed-typecheck))
 
 (define (hld-lt i1 i2 i3)
-  (if (or (hld-int-indet i1) (hld-int-indet i2))
-      indeterminate
-      (< (hld-int-val i1) (hld-int-val i2))))
+  (hld-op < i1 i2))
+
+(define (hld-eq i1 i2 i3)
+  (hld-op equal? i1 i2))
 
 (define (hld-eq-int i1 i2 i3)
-  (if (or (hld-int-indet i1) (hld-int-indet i2))
-      indeterminate
-      (equal? i1 i2)))
+  (hld-op equal? i1 i2))
 
 (define (hld-eq-bool b1 b2 i3)
   (if (and (boolean? b1) (boolean? b2))
@@ -136,7 +122,7 @@
       'failed-typecheck))
 
 (define (hld-negate i1 i2 i3)
-  (hld-int #f #f (- (hld-int-val i1))))
+  (- i1))
 
 ;; fold semantically does nothing, but is important for ordering
 (define (hld-fold i1)
@@ -155,12 +141,14 @@
 (define div-operator (operator hld-div 2 "hld-div"))
 (define min-operator (operator hld-min 2 "hld-min"))
 (define max-operator (operator hld-max 2 "hld-max"))
+(define eq-operator (operator hld-eq 2 "hld-eq"))
 (define eq-int-operator (operator hld-eq-int 2 "hld-eq-int"))
 (define eq-bool-operator (operator hld-eq-bool 2 "hld-eq-bool"))
 (define lt-operator (operator hld-lt 2 "hld-lt"))
 (define and-operator (operator hld-and 2 "hld-and"))
 (define or-operator (operator hld-or 2 "hld-or"))
 (define not-operator (operator hld-not 1 "hld-not"))
+(define select-operator (operator hld-select 3 "hld-select"))
 (define select-int-operator (operator hld-select-int 3 "hld-select-int"))
 (define select-bool-operator (operator hld-select-bool 3 "hld-select-bool"))
 (define negate-operator (operator hld-negate 1 "hld-negate"))
@@ -178,14 +166,12 @@
         div-operator ;; 6
         min-operator ;; 7
         max-operator ;; 8
-        eq-int-operator ;; 9
-        eq-bool-operator ;; 10
-        lt-operator ;; 11
-        and-operator ;; 12
-        or-operator ;; 13
-        not-operator ;; 14
-        select-int-operator ;; 15
-        select-bool-operator ;; 16
+        eq-operator ;; 9
+        lt-operator ;; 10
+        and-operator ;; 11
+        or-operator ;; 12
+        not-operator ;; 13
+        select-operator ;; 14
         ))
 
 (define noop-idx 0)
@@ -197,14 +183,16 @@
 (define div-idx 6)
 (define min-idx 7)
 (define max-idx 8)
-(define eq-int-idx 9)
-(define eq-bool-idx 10)
-(define lt-idx 11)
-(define and-idx 12)
-(define or-idx 13)
-(define not-idx 14)
-(define select-int-idx 15)
-(define select-bool-idx 16)
+(define eq-idx 9)
+;(define eq-int-idx 9)
+;(define eq-bool-idx 10)
+(define lt-idx 10)
+(define and-idx 11)
+(define or-idx 12)
+(define not-idx 13)
+(define select-idx 14)
+;(define select-int-idx 15)
+;(define select-bool-idx 16)
 
 (define (get-operator-by-idx idx)
   (list-ref operator-list idx))

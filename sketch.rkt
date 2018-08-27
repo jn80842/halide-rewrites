@@ -4,11 +4,9 @@
 
 (provide (all-defined-out))
 
-(define (get-sym-hld-int)
-  ;(define-symbolic* indet-flag boolean?)
-  ;(define-symbolic* const-flag boolean?)
-  (define-symbolic* int integer?)
-  (hld-int #f #f int))
+(define (get-sym-int)
+  (define-symbolic* x integer?)
+  x)
 
 (define (get-sym-bool)
   (define-symbolic* b boolean?)
@@ -66,7 +64,7 @@
                 (cond [(equal? (length (sketch-insn-list sk)) i) calculated-regs]
                       [else (let ([next-reg (call-insn (list-ref (sketch-insn-list sk) i) calculated-regs)])
                               (f (append calculated-regs (list next-reg)) (add1 i)))]))])
-    (λ inputs (list-ref (f (append inputs (list (hld-int #f #f 0))) 0) (sketch-retval-idx sk)))))
+    (λ inputs (list-ref (f (append inputs (list 0)) 0) (sketch-retval-idx sk)))))
 
 
 

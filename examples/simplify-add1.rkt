@@ -20,14 +20,14 @@
                     2
                     0))
 
-(define x (get-sym-hld-int))
-(define y (get-sym-hld-int))
+(define-symbolic* x integer?)
+(define-symbolic* y integer?)
 
 (define RHS-sketch (get-symbolic-sketch 2 2 0))
 
-(displayln "No ordering")
+(displayln "Synthesize without specified ordering")
 (define synth1-sketch (synth-rewrite RHS-sketch LHS x y))
-(displayln "Ordering on variable count")
+(displayln "Synthesize with ordering on variable count")
 (define synth2-sketch (synth-rewrite-var-counts RHS-sketch LHS x y))
-(displayln "Ordering on variable count and naive operator counts")
+(displayln "Synthesize with ordering on variable count and naive operator counts")
 (define synth3-sketch (synth-rewrite-var-and-op-counts RHS-sketch LHS x y))

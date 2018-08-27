@@ -35,7 +35,7 @@
          [(MAX OP exp COMMA exp CP) (list max-idx $3 $5)]
          [(MIN OP exp COMMA exp CP) (list min-idx $3 $5)]
          [(! OP exp CP) (list not-idx $3)]
-         [(SELECT OP exp COMMA exp COMMA exp CP) (list select-int-idx $3 $5 $7)]
+         [(SELECT OP exp COMMA exp COMMA exp CP) (list select-idx $3 $5 $7)]
          [(exp AND exp) (list and-idx $1 $3)]
          [(exp OR exp) (list or-idx $1 $3)]
          [(exp + exp) (list add-idx $1 $3)]
@@ -45,7 +45,7 @@
          [(exp % exp) (list mod-idx $1 $3)]
          [(exp < exp) (list lt-idx $1 $3)]
          [(exp > exp) (list lt-idx $1 $3)] ;; x > y --> y < x
-         [(exp EQ exp) (list eq-int-idx $1 $3)]
+         [(exp EQ exp) (list eq-idx $1 $3)]
          [(exp GE exp) (list lt-idx not-idx $1 $3)] ;; x >= y --> ! x < y
          [(exp LE exp) (list lt-idx not-idx $1 $3)] ;; x <= y --> ! y < x
          [(- exp) (list negate-idx $2)]

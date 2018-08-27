@@ -20,9 +20,9 @@
 ;; R9 : select R0 R4 R5
 ;; R10 : R8 + R9
 
-(define select-LHS (sketch (list (insn select-int-idx 0 1 2)
+(define select-LHS (sketch (list (insn select-idx 0 1 2)
                                  (insn add-idx 7 3 0)
-                                 (insn select-int-idx 0 4 5)
+                                 (insn select-idx 0 4 5)
                                  (insn add-idx 8 9 0))
                            10
                            6
@@ -30,14 +30,15 @@
 
 (define select-RHS (get-symbolic-sketch 4 6 0))
 
-(define-symbolic* x boolean?)
-(define y (get-sym-hld-int))
-(define z (get-sym-hld-int))
-(define w (get-sym-hld-int))
-(define u (get-sym-hld-int))
-(define v (get-sym-hld-int))
+(define x (get-sym-bool))
+(define y (get-sym-int))
+(define z (get-sym-int))
+(define w (get-sym-int))
+(define u (get-sym-int))
+(define v (get-sym-int))
 
-(synth-rewrite-var-and-op-counts select-RHS select-LHS x y z w u v)
+(define synth1-sketch (synth-rewrite select-RHS select-LHS x y z w u v))
+;(synth-rewrite-var-and-op-counts select-RHS select-LHS x y z w u v)
 
 ;; synthesized in 813s (13.5min)
 

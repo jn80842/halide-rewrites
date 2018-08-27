@@ -28,7 +28,7 @@
            [(error start) $2]
            [(exp) $1])
 
-    (exp [(NUM) (if use-wild-constants? (hash-ref const-hash $1) (hld-int #f #f $1))]
+    (exp [(NUM) (if use-wild-constants? (hash-ref const-hash $1) $1)]
          [(VAR) (hash-ref var-hash $1)]
          [(MAX OP exp COMMA exp CP) (hld-max $3 $5)]
          [(MIN OP exp COMMA exp CP) (hld-min $3 $5)]

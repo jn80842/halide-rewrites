@@ -24,49 +24,50 @@
 (check-equal? (euclidean-mod 25 -3) 1)
 (check-equal? (euclidean-mod -25 -3) 2)
 
-(define three (hld-int #f #f 3))
-(define two (hld-int #f #f 2))
-(define one (hld-int #f #f 1))
-(define zero (hld-int #f #f 0))
-(define negative-one (hld-int #f #f -1))
-(define negative-two (hld-int #f #f -2))
+(define three 3)
+(define two 2)
+(define one 1)
+(define zero 0)
+(define negative-one -1)
+(define negative-two -2)
+(define dummy 0)
 
 
-(check-equal? (hld-add one negative-one) zero)
+(check-equal? (hld-add one negative-one dummy) zero)
 
-(check-equal? (hld-sub one negative-one) two)
+(check-equal? (hld-sub one negative-one dummy) two)
 
-(check-equal? (hld-mod three two) one)
+(check-equal? (hld-mod three two dummy) one)
 
-(check-equal? (hld-div three two) one)
+(check-equal? (hld-div three two dummy) one)
 
-(check-equal? (hld-min negative-two zero) negative-two)
+(check-equal? (hld-min negative-two zero dummy) negative-two)
 
-(check-equal? (hld-max negative-two zero) zero)
+(check-equal? (hld-max negative-two zero dummy) zero)
 
-(check-true (hld-eq-int negative-one negative-one))
-(check-false (hld-eq-int negative-one negative-two))
+(check-true (hld-eq-int negative-one negative-one dummy))
+(check-false (hld-eq-int negative-one negative-two dummy))
 
-(check-true (hld-eq-bool #t #t))
-(check-true (hld-eq-bool #f #f))
-(check-false (hld-eq-bool #t #f))
-(check-false (hld-eq-bool #f #t))
+(check-true (hld-eq-bool #t #t dummy))
+(check-true (hld-eq-bool #f #f dummy))
+(check-false (hld-eq-bool #t #f dummy))
+(check-false (hld-eq-bool #f #t dummy))
 
-(check-true (hld-lt negative-two negative-one))
-(check-false (hld-lt negative-two negative-two))
-(check-false (hld-lt zero negative-two))
+(check-true (hld-lt negative-two negative-one dummy))
+(check-false (hld-lt negative-two negative-two dummy))
+(check-false (hld-lt zero negative-two dummy))
 
-(check-true (hld-and #t #t))
-(check-false (hld-and #t #f))
-(check-equal? (hld-and one #t) 'failed-typecheck)
+(check-true (hld-and #t #t dummy))
+(check-false (hld-and #t #f dummy))
+(check-equal? (hld-and one #t dummy) 'failed-typecheck)
 
-(check-true (hld-or #t #f))
-(check-false (hld-or #f #f))
-(check-equal? (hld-or one #f) 'failed-typecheck)
+(check-true (hld-or #t #f dummy))
+(check-false (hld-or #f #f dummy))
+(check-equal? (hld-or one #f dummy) 'failed-typecheck)
 
-(check-true (hld-not #f))
-(check-false (hld-not #t))
-(check-equal? (hld-not one) 'failed-typecheck)
+(check-true (hld-not #f dummy dummy))
+(check-false (hld-not #t dummy dummy))
+(check-equal? (hld-not one dummy dummy) 'failed-typecheck)
 
 (check-equal? (hld-select-int #t one two) one)
 (check-equal? (hld-select-int #f one two) two)
