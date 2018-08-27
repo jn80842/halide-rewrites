@@ -16,16 +16,16 @@
 
 (define LHS (sketch (list (insn lt-idx 1 0 0)
                           (insn lt-idx 0 1 0)
-                          (insn or-idx 2 3 0))
-                    4
+                          (insn or-idx 3 4 0))
+                    5
                     1
                     1))
 
 (define RHS-sketch (get-symbolic-sketch 3 1 1))
 
-(define x (get-sym-hld-int))
-(define c1 (get-sym-hld-int))
-(define negative-one (hld-int #f #f -1))
+(define x (get-sym-int))
+(define c1 (get-sym-int))
+(define negative-one -1)
 
 (verify-bool-expr LHS x negative-one)
 

@@ -37,8 +37,8 @@
 (define u (get-sym-int))
 (define v (get-sym-int))
 
-(define synth1-sketch (synth-rewrite select-RHS select-LHS x y z w u v))
-;(synth-rewrite-var-and-op-counts select-RHS select-LHS x y z w u v)
+;(define synth1-sketch (synth-rewrite select-RHS select-LHS x y z w u v))
+(synth-rewrite-var-and-op-counts select-RHS select-LHS x y z w u v)
 
 ;; synthesized in 813s (13.5min)
 

@@ -45,17 +45,17 @@
 
 (define RHS-sketch (get-symbolic-sketch 9 3 4))
 
-(define v0 (get-sym-hld-int))
-(define v1 (get-sym-hld-int))
-(define v2 (get-sym-hld-int))
-(define zero (hld-int #f #f 0))
-(define twelve (hld-int #f #f 12))
-(define twenty (hld-int #f #f 20))
-(define negative144 (hld-int #f #f -144))
-(define c0 (get-sym-hld-int))
-(define c1 (get-sym-hld-int))
-(define c2 (get-sym-hld-int))
-(define c3 (get-sym-hld-int))
+(define v0 (get-sym-int))
+(define v1 (get-sym-int))
+(define v2 (get-sym-int))
+(define zero 0)
+(define twelve 12)
+(define twenty 20)
+(define negative144 -144)
+(define c0 (get-sym-int))
+(define c1 (get-sym-int))
+(define c2 (get-sym-int))
+(define c3 (get-sym-int))
 
 ;(verify-bool-expr LHS v0 v1 v2 zero twelve twenty negative144)
 

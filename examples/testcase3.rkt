@@ -23,22 +23,22 @@
                           (insn mod-idx 5 3 0)
                           (insn sub-idx 1 6 0)
                           (insn div-idx 7 3 0)
-                          (insn eq-int-idx 8 4 0))
+                          (insn eq-idx 8 4 0))
                     9
                     1
                     4))
 
 (define RHS-sketch (get-symbolic-sketch 5 1 4))
 
-(define x (get-sym-hld-int))
-(define zero (hld-int #f #f 0))
-(define one (hld-int #f #f 7))
-(define two (hld-int #f #f 136))
-(define three (hld-int #f #f -1))
-(define c0 (get-sym-hld-int))
-(define c1 (get-sym-hld-int))
-(define c2 (get-sym-hld-int))
-(define c3 (get-sym-hld-int))
+(define x (get-sym-int))
+(define zero 0)
+(define one 7)
+(define two 136)
+(define three -1)
+(define c0 (get-sym-int))
+(define c1 (get-sym-int))
+(define c2 (get-sym-int))
+(define c3 (get-sym-int))
 
 (verify-bool-expr LHS x zero one two three)
 

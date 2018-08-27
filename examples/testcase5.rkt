@@ -30,12 +30,12 @@
 
 (define RHS-sketch (get-symbolic-sketch 3 1 2))
 
-(define x (get-sym-hld-int))
-(define -one (hld-constant -1))
-(define -ten (hld-constant -10))
-(define zero (hld-constant 0))
-(define c0 (get-sym-hld-int))
-(define c1 (get-sym-hld-int))
+(define x (get-sym-int))
+(define -one -1)
+(define -ten -10)
+(define zero 0)
+(define c0 (get-sym-int))
+(define c1 (get-sym-int))
 
 (displayln "For LHS (-1 < v0) || (v0 < -10)")
 ;(verify-bool-expr LHS x -one -ten)

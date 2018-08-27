@@ -23,8 +23,8 @@
 
 (define RHS-sketch (get-symbolic-sketch 3 3 0))
 
-(define x (get-sym-hld-int))
-(define y (get-sym-hld-int))
-(define z (get-sym-hld-int))
+(define x (get-sym-int))
+(define y (get-sym-int))
+(define z (get-sym-int))
 
 (synth-rewrite RHS-sketch LHS x y z)

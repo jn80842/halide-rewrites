@@ -27,10 +27,10 @@
 
 (define RHS-sketch (get-symbolic-sketch 4 2 1))
 
-(define x (get-sym-hld-int))
-(define y (get-sym-hld-int))
-(define -one (hld-int #f #f -1))
-(define c0 (get-sym-hld-int))
+(define x (get-sym-int))
+(define y (get-sym-int))
+(define -one -1)
+(define c0 (get-sym-int))
 
 (verify-bool-expr LHS x y -one)
 

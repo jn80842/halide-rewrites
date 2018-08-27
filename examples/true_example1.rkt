@@ -43,10 +43,10 @@
 
 (define RHS-sketch (get-symbolic-sketch 10 2 3))
 
-(define x (get-sym-hld-int))
-(define y (get-sym-hld-int))
-(define zero (hld-int #f #f 0))
-(define two (hld-int #f #f 2))
-(define seven (hld-int #f #f 7))
+(define x (get-sym-int))
+(define y (get-sym-int))
+(define zero 0)
+(define two 2)
+(define seven 7)
 
 (synth-rewrite RHS-sketch LHS x y zero two seven)
