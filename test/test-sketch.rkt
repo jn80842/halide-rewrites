@@ -5,11 +5,11 @@
 (require "../lang.rkt")
 (require "../sketch.rkt")
 
-(define x (get-sym-hld-int))
-(define y (get-sym-hld-int))
-(define zero (hld-constant 0))
-(define -one (hld-constant -1))
-(define -ten (hld-constant -10))
+(define x (get-sym-int))
+(define y (get-sym-int))
+(define zero 0)
+(define -one -1)
+(define -ten -10)
 
 (define sk1 (sketch (list (insn add-idx 0 1 2))
                     3 2 0))
@@ -33,3 +33,13 @@
                     6 2 3))
 
 (check-true (unsat? (verify (assert (equal? ((get-sketch-function sk3) x y zero -one -ten) (hld-sub x y #f))))))
+
+(define small-div-sk (sketch (list (insn div-idx 0 1 0)) 3 2 0))
+
+(check-equal? (get-divisors small-div-sk 3 6) '(6))
+
+(define div-sk2 (sketch (list (insn div-idx 0 1 0)
+                              (insn add-idx 0 3 0)
+                              (insn mod-idx 0 4 0)) 5 2 0))
+
+(check-equal? (get-divisors div-sk2 6 3) '(3 8))

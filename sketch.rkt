@@ -21,12 +21,22 @@
 (define (call-insn i registers)
   ((get-operator-function-by-idx (insn-op-idx i)) (list-ref registers (insn-arg1-idx i)) (list-ref registers (insn-arg2-idx i)) (list-ref registers (insn-arg3-idx i))))
 
+(define (call-with-divisors-insn i registers divisors)
+  (let ([op-idx (insn-op-idx i)])
+    (if (or (equal? op-idx div-idx) (equal? op-idx mod-idx))
+        ((get-operator-function-by-idx op-idx) (list-ref registers (insn-arg1-idx i)) (list-ref divisors (insn-arg2-idx i)) (list-ref registers (insn-arg3-idx i)))
+        ((get-operator-function-by-idx op-idx) (list-ref registers (insn-arg1-idx i)) (list-ref registers (insn-arg2-idx i)) (list-ref registers (insn-arg3-idx i))))))
+
 (define (get-sym-insn)
   (define-symbolic* op integer?)
   (define-symbolic* arg1 integer?)
   (define-symbolic* arg2 integer?)
   (define-symbolic* arg3 integer?)
   (insn op arg1 arg2 arg3))
+
+(define (has-divisor? insn)
+  (or (equal? (insn-op-idx insn) div-idx)
+      (equal? (insn-op-idx insn) mod-idx)))
 
 (struct sketch (insn-list retval-idx nc-input-count const-input-count) #:transparent)
 
@@ -66,9 +76,21 @@
                               (f (append calculated-regs (list next-reg)) (add1 i)))]))])
     (λ inputs (list-ref (f (append inputs (list 0)) 0) (sketch-retval-idx sk)))))
 
+(define (evaluate-RHS RHS-sk LHS-divisors inputs)
+  (letrec ([f (λ (calculated-regs i)
+                (cond [(equal? (length (sketch-insn-list RHS-sk)) i) calculated-regs]
+                      [else (let ([next-reg (call-with-divisors-insn (list-ref (sketch-insn-list RHS-sk) i) calculated-regs LHS-divisors)])
+                              (f (append calculated-regs (list next-reg)) (add1 i)))]))])
+    (list-ref (f (append inputs (list 0)) 0) (sketch-retval-idx RHS-sk))))
 
+(define (get-divisors sk . inputs)
+  (let ([divisor-insn-indexes (filter (λ (n) (has-divisor? (list-ref (sketch-insn-list sk) n)))
+                                      (range (length (sketch-insn-list sk))))])
+    (for/list ([n divisor-insn-indexes])
+      (evaluate-divisor sk n inputs))))
 
-
-
+(define (evaluate-divisor sk insn-idx inputs)
+  (let ([divisor-idx (insn-arg2-idx (list-ref (sketch-insn-list sk) insn-idx))])
+    (apply (get-sketch-function (sketch (sketch-insn-list sk) divisor-idx (sketch-nc-input-count sk) (sketch-const-input-count sk))) inputs)))
 
 

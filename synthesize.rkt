@@ -1,5 +1,6 @@
 #lang rosette
 
+(require "lang.rkt")
 (require "sketch.rkt")
 (require "print-sketch.rkt")
 (require "ordering.rkt")
@@ -34,7 +35,7 @@
 (define (synth-rewrite RHS-sketch LHS . inputs)
   (begin (clear-asserts!)
          (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
-               [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
+               [evaled-RHS (evaluate-RHS RHS-sketch (apply (curry get-divisors LHS) inputs) inputs)])
            (begin
              (define binding (time (synthesize #:forall (symbolics inputs)
                                                #:guarantee (assert (equal? evaled-LHS evaled-RHS)))))
@@ -77,7 +78,7 @@
 #;(define (synth-rewrite-to-ordering RHS-sketch LHS min-sketch . inputs)
   (begin (clear-asserts!)
          (let ([evaled-LHS (apply (get-sketch-function LHS) inputs)]
-               [evaled-RHS (apply (get-sketch-function RHS-sketch) inputs)])
+               [evaled-RHS (evaluate-RHS RHS-sketch (appy (curry get-divisors LHS) inputs) inputs)])
            (begin
              (define binding (time (synthesize #:forall (symbolics inputs)
                                                #:guarantee (assert (and (sketch-ordering-greater-than LHS RHS-sketch)
