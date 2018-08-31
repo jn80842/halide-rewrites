@@ -11,7 +11,7 @@
 (provide halide-lexer evaluate-parser value-tokens op-tokens)
 
 (define-tokens value-tokens (NUM VAR))
-(define-empty-tokens op-tokens (newline OP CP COMMA + - * / % ^ < > ! EQ GE LE EOF NEG OR AND MAX MIN SELECT))
+(define-empty-tokens op-tokens (newline OP CP COMMA + - * / % ^ < > ! EQ GE LE EOF NEG OR AND MAX MIN SELECT TRUE FALSE))
 
 ;; A hash table to store variable values in for the calculator
 (define vars (make-hash))
@@ -45,6 +45,8 @@
    ["max" 'MAX]
    ["min" 'MIN]
    ["select" 'SELECT]
+   ["true" 'TRUE]
+   ["false" 'FALSE]
    ;[(:+ (:or lower-letter upper-letter)) (token-VAR (string->symbol lexeme))]
    [(:: "v" (:+ digit)) (token-VAR (string->symbol lexeme))]
    [(:+ digit) (token-NUM (string->number lexeme))]
@@ -77,6 +79,8 @@
     
     (exp [(NUM) $1]
          [(VAR) (hash-ref vars $1 (lambda () 0))]
+         [(TRUE) #t]
+         [(FALSE) #f]
          [(exp EQ exp) (equal? $1 $3)]
          [(MAX OP exp COMMA exp CP) (max $3 $5)]
          [(MIN OP exp COMMA exp CP) (min $3 $5)]

@@ -6,7 +6,7 @@
 
 (require "parser.rkt")
 
-(provide masked-constants get-variable-count get-constant-count)
+(provide masked-constants get-variables get-variable-count get-constant-count)
 
 (define wild-constants-hash (make-hash))
 (define variable-set (mutable-set))
@@ -43,6 +43,8 @@
 
     (exp [(NUM) (get-wild-constant wild-constants-hash $1)]
          [(VAR) (build-variable-set variable-set $1)]
+         [(TRUE) "true"]
+         [(FALSE) "false"]
          [(MAX OP exp COMMA exp CP) (format "max(~a,~a)" $3 $5)]
          [(MIN OP exp COMMA exp CP) (format "min(~a,~a)" $3 $5)]
          [(! OP exp CP) (format "!(~a)" $3)]
@@ -79,12 +81,17 @@
   (masked-constants s)
   (set-count variable-set))
 
+(define (get-variables s)
+  (set-clear! variable-set)
+  (masked-constants s)
+  (set-copy variable-set))
+
 (define (get-constant-count s)
   (hash-clear! wild-constants-hash)
   (masked-constants s)
   (hash-count wild-constants-hash))
 
-(call-with-output-file "/Users/jnewcomb/testcases/08_02_2018/processed_part5.txt" #:exists 'append
+#;(call-with-output-file "/Users/jnewcomb/testcases/08_02_2018/processed_part5.txt" #:exists 'append
   (λ (out)
     (for-each (λ (s) (begin
                        (hash-clear! wild-constants-hash)

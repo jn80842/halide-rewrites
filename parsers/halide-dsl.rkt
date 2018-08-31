@@ -43,7 +43,7 @@
          [(exp % exp) (hld-mod $1 $3)]
          [(exp < exp) (hld-lt $1 $3)]
          [(exp > exp) (hld-lt $3 $1)] ;; x > y --> y < x
-         [(exp EQ exp) (hld-eq-int $1 $3)]
+         [(exp EQ exp) (hld-eq $1 $3)]
          [(exp GE exp) (hld-not (hld-lt $1 $3))] ;; x >= y --> ! x < y
          [(exp LE exp) (hld-not (hld-lt $3 $1))] ;; x <= y --> ! y < x
          [(- exp) (hld-negate $2)]

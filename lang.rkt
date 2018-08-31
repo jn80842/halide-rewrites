@@ -54,25 +54,25 @@
 (define (hld-op op i1 i2)
   (op i1 i2))
 
-(define (hld-add i1 i2 i3)
+(define (hld-add i1 i2 [i3 0])
   (hld-op + i1 i2))
 
-(define (hld-sub i1 i2 i3)
+(define (hld-sub i1 i2 [i3 0])
   (hld-op - i1 i2))
 
-(define (hld-mul i1 i2 i3)
+(define (hld-mul i1 i2 [i3 0])
   (hld-op * i1 i2))
 
-(define (hld-div i1 i2 i3)
+(define (hld-div i1 i2 [i3 0])
   (hld-op euclidean-div i1 i2))
 
-(define (hld-mod i1 i2 i3)
+(define (hld-mod i1 i2 [i3 0])
   (hld-op euclidean-mod i1 i2))
 
-(define (hld-max i1 i2 i3)
+(define (hld-max i1 i2 [i3 0])
   (hld-op max i1 i2))
 
-(define (hld-min i1 i2 i3)
+(define (hld-min i1 i2 [i3 0])
   (hld-op min i1 i2))
 
 ;; untyped select that assumes b1 is boolean
@@ -92,36 +92,36 @@
 
 ;; ramp and broadcast
 
-(define (hld-not b i2 i3)
+(define (hld-not b [i2 0] [i3 0])
   (if (boolean? b)
       (not b)
       'failed-typecheck))
 
-(define (hld-and b1 b2 i3)
+(define (hld-and b1 b2 [i3 0])
   (if (and (boolean? b1) (boolean? b2))
       (and b1 b2)
       'failed-typecheck))
 
-(define (hld-or b1 b2 i3)
+(define (hld-or b1 b2 [i3 0])
   (if (and (boolean? b1) (boolean? b2))
       (or b1 b2)
       'failed-typecheck))
 
-(define (hld-lt i1 i2 i3)
+(define (hld-lt i1 i2 [i3 0])
   (hld-op < i1 i2))
 
-(define (hld-eq i1 i2 i3)
+(define (hld-eq i1 i2 [i3 0])
   (hld-op equal? i1 i2))
 
-(define (hld-eq-int i1 i2 i3)
+(define (hld-eq-int i1 i2 [i3 0])
   (hld-op equal? i1 i2))
 
-(define (hld-eq-bool b1 b2 i3)
+(define (hld-eq-bool b1 b2 [i3 0])
   (if (and (boolean? b1) (boolean? b2))
       (or (and b1 b2) (nor b1 b2))
       'failed-typecheck))
 
-(define (hld-negate i1 i2 i3)
+(define (hld-negate i1 [i2 0] [i3 0])
   (- i1))
 
 ;; fold semantically does nothing, but is important for ordering

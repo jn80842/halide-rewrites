@@ -109,9 +109,12 @@
               (displayln "no solution found")
               (print-live-regs-sketch (evaluate RHS-sketch binding))))))))
 
+(define (build-variable-lookup var-set)
+  (make-hash (map (λ (s) (cons s (get-sym-int))) (set->list var-set))))
+
 (define (verify-testcase s)
-  (let* ([sym-vars (for/list ([i (range (get-variable-count s))]) (get-sym-int))]
-         [var-hash (build-var-lookup "v" sym-vars)]
+  (let* ([variable-symbols (get-variables s)]
+         [var-hash (build-variable-lookup variable-symbols)]
          [p (parser-to-hld-dsl #f var-hash (make-hash '()))]
          [model (time (verify (assert (evaluate-parser p s))))])
     (unsat? model)))
