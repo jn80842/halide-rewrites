@@ -45,6 +45,12 @@
         [(negative? y) (quotient x y)]
         [else (quotient x y)]))
 
+;; involves casting from ints to reals and back so may not be faster than definition above
+#;(define (euclidean-div x y)
+  (if (< 0 y)
+      (floor (/ x y))
+      (ceiling (/ x y))))
+
 (define (euclidean-mod x y)
   (cond [(and (negative? x) (negative? y)) (- (- (modulo (abs x) (abs y))) (* y (div-in-Z-val x y)))]
         [(negative? x) (+ (- (modulo (abs x) y)) (* y (div-in-Z-val x y)))]
