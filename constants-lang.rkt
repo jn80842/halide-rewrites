@@ -90,21 +90,40 @@
 (define eq-operator (operator hld-eq 2 "equal?"))
 
 (define operator-list
-  (list ;;add-operator
-        ;;sub-operator
+  (list add-operator
+        sub-operator
         mul-operator
-        ;;neg-operator
-        ;;max-operator
-        ;;min-operator
-       ;; not-operator
+        neg-operator
+        max-operator
+        min-operator
+        not-operator
         and-operator
-        ;;or-operator
-       ;; lt-operator
+        or-operator
+        lt-operator
         gt-operator
-       ;; le-operator
+        le-operator
         ge-operator
-       ;; eq-operator
+        eq-operator
         ))
+
+(define comm-operator-list
+  (list add-operator
+        mul-operator
+        max-operator
+        min-operator
+        and-operator
+        or-operator
+        eq-operator))
+
+;; not sure what to do with neg or not
+(define ordered-operator-list
+  (list sub-operator
+        neg-operator
+        not-operator
+        lt-operator
+        gt-operator
+        le-operator
+        ge-operator))
 
 (define add-idx 0)
 (define sub-idx 1)
@@ -129,3 +148,7 @@
   (operator-name (get-operator-by-idx idx)))
 (define (get-operator-function-by-idx idx)
   (operator-function (get-operator-by-idx idx)))
+(define (get-comm-operator-function-by-idx idx)
+  (operator-function (list-ref comm-operator-list idx)))
+(define (get-ordered-operator-function-by-idx idx)
+  (operator-function (list-ref ordered-operator-list idx)))
