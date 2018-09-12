@@ -29,6 +29,22 @@
 ;;         | BoolExpr == BoolExpr
 ;;         | Bool;
 
+(define (bvand-hld b1 b2)
+  (let ([btrue (bv 1 bvw)]
+        [bfalse (bv 0 bvw)])
+    (if (bveq b1 bfalse)
+        bfalse
+        (if (bveq b2 bfalse)
+            bfalse
+            btrue))))
+
+(define (bvor-hld b1 b2)
+  (let ([btrue (bv 1 bvw)]
+        [bfalse (bv 0 bvw)])
+    (if (not (bveq b1 bfalse))
+        btrue
+        (not (bveq b2 bfalse)))))
+
 (define (bvsmax b1 b2)
   (if (bvsgt b1 b2) b1 b2))
 
@@ -90,39 +106,78 @@
                                                           (if (bveq idx (bv 14 bvw))
                                                               bvnot-hld
                                                               noop))))))))))))))))
+
+(define bvadd-idx (bv 0 bvw))
+(define bvsub-idx (bv 1 bvw))
+(define bvmul-idx (bv 2 bvw))
+(define bvsdiv-idx (bv 3 bvw))
+(define bvsmod-idx (bv 4 bvw))
+(define bvsmax-idx (bv 5 bvw))
+(define bvsmin-idx (bv 6 bvw))
+(define bvand-idx (bv 7 bvw))
+(define bvor-idx (bv 8 bvw))
+(define bvslt-idx (bv 9 bvw))
+(define bvsle-idx (bv 10 bvw))
+(define bvsgt-idx (bv 11 bvw))
+(define bvsge-idx (bv 12 bvw))
+(define bveq-idx (bv 13 bvw))
+(define bvnot-idx (bv 14 bvw))
+
+(define (is-noop? idx)
+  (bvsgt idx bvnot-idx))
+
 (define (get-operator-name-by-idx idx)
-  (if (bveq idx (bv 0 bvw))
+  (if (bveq idx bvadd-idx)
       "bvadd"
-      (if (bveq idx (bv 1 bvw))
+      (if (bveq idx bvsub-idx)
           "bvsub"
-          (if (bveq idx (bv 2 bvw))
+          (if (bveq idx bvmul-idx)
               "bvmul"
-              (if (bveq idx (bv 3 bvw))
+              (if (bveq idx bvsdiv-idx)
                   "bvsdiv"
-                  (if (bveq idx (bv 4 bvw))
+                  (if (bveq idx bvsmod-idx)
                       "bvsmod"
-                      (if (bveq idx (bv 5 bvw))
+                      (if (bveq idx bvsmax-idx)
                           "bvsmax"
-                          (if (bveq idx (bv 6 bvw))
+                          (if (bveq idx bvsmin-idx)
                               "bvsmin"
-                              (if (bveq idx (bv 7 bvw))
+                              (if (bveq idx bvand-idx)
                                   "bvand"
-                                  (if (bveq idx (bv 8 bvw))
+                                  (if (bveq idx bvor-idx)
                                       "bvor"
-                                      (if (bveq idx (bv 9 bvw))
+                                      (if (bveq idx bvslt-idx)
                                           "bvslt"
-                                          (if (bveq idx (bv 10 bvw))
+                                          (if (bveq idx bvsle-idx)
                                               "bvsle"
-                                              (if (bveq idx (bv 11 bvw))
+                                              (if (bveq idx bvsgt-idx)
                                                   "bvsgt"
-                                                  (if (bveq idx (bv 12 bvw))
+                                                  (if (bveq idx bvsge-idx)
                                                       "bvsge"
-                                                      (if (bveq idx (bv 13 bvw))
+                                                      (if (bveq idx bveq-idx)
                                                           "bveq"
-                                                          (if (bveq idx (bv 14 bvw))
+                                                          (if (bveq idx bvnot-idx)
                                                               "bvnot-hld"
                                                               "noop"))))))))))))))))
+
 (define get-op get-operator-function-by-idx)
+
+(define (single-arg-function? idx)
+  (or (is-noop? idx)
+      (bveq idx bvnot-idx)))
+
+(define (count-variables1 idx)
+  (if (single-arg-function? idx) 1 2))
+
+(define (count-variables2 op0 op1 op2)
+  (if (single-arg-function? op0)
+      (count-variables1 op1)
+      (+ (count-variables1 op1) (count-variables1 op2))))
+  
+(define (count-variables3 fsk)
+  (if (single-arg-function? (fixedsk3-op0 fsk))
+      (count-variables2 (fixedsk3-op1 fsk) (fixedsk3-op3 fsk) (fixedsk3-op4 fsk))
+      (+ (count-variables2 (fixedsk3-op1 fsk) (fixedsk3-op3 fsk) (fixedsk3-op4 fsk))
+         (count-variables2 (fixedsk3-op2 fsk) (fixedsk3-op5 fsk) (fixedsk3-op6 fsk)))))
 
 (define (get-fixed-input idx i0 i1 i2 i3)
   (if (bveq idx (bv 0 bvw))
@@ -151,21 +206,23 @@
 
 (define (get-fixed-input-names3 idx)
   (let ([inputs (for/list ([i (range (expt 2 3))]) (string-append "b" (number->string i)))])
-    (if (bveq idx (bv 0 bvw))
-      (list-ref inputs 0)
-      (if (bveq idx (bv 1 bvw))
-          (list-ref inputs 1)
-          (if (bveq idx (bv 2 bvw))
-              (list-ref inputs 2)
-              (if (bveq idx (bv 3 bvw))
-                  (list-ref inputs 3)
-                  (if (bveq idx (bv 4 bvw))
-                      (list-ref inputs 4)
-                      (if (bveq idx (bv 5 bvw))
-                          (list-ref inputs 5)
-                          (if (bveq idx (bv 6 bvw))
-                              (list-ref inputs 6)
-                              (list-ref inputs 7))))))))))
+    (if (term? idx)
+        "null"
+        (if (bveq idx (bv 0 bvw))
+            (list-ref inputs 0)
+            (if (bveq idx (bv 1 bvw))
+                (list-ref inputs 1)
+                (if (bveq idx (bv 2 bvw))
+                    (list-ref inputs 2)
+                    (if (bveq idx (bv 3 bvw))
+                        (list-ref inputs 3)
+                        (if (bveq idx (bv 4 bvw))
+                            (list-ref inputs 4)
+                            (if (bveq idx (bv 5 bvw))
+                                (list-ref inputs 5)
+                                (if (bveq idx (bv 6 bvw))
+                                    (list-ref inputs 6)
+                                    (list-ref inputs 7)))))))))))
 
 (struct fixedsk2 (op0 op1 op2 input0 input1 input2 input3) #:transparent)
 
@@ -230,11 +287,27 @@
         (displayln "no solution")
         (displayln binding))))
 
+(define (synthesize-rewrite expr sk sym-inputs)
+  (let* ([evaled-rhs (apply (get-sketch-function3 sk) sym-inputs)]
+         [evaled-lhs (apply expr sym-inputs)])
+    (begin
+      (define binding (time (synthesize #:forall sym-inputs
+                                        #:guarantee (assert (equal? evaled-rhs evaled-lhs)))))
+      (if (unsat? binding)
+          (displayln "could not find expression")
+          (displayln (get-string-sketch-function3 (evaluate sk binding)))))))
+
+(define (testcase x y z w p q r s)
+  (bvsle (bvsdiv (bvsub y x) z) (bvsdiv (bvsub w x) z)))
+
 (define (testcase-c-expr x y z a b c d)
   (bvsle (bvadd (bvmul (bvadd (bvsmin z a) (bvadd (bvmul x b) y)) c) (bvsub (bv 0 7) d))
       (bvmul (bvadd (bvmul x b) y) c)))
 
-(define-symbolic* bx (bitvector 7))
-(define-symbolic* by (bitvector 7))
-(define-symbolic* bz (bitvector 7))
-(define-symbolic* bw (bitvector 7))
+(define-symbolic* bx (bitvector bvw))
+(define-symbolic* by (bitvector bvw))
+(define-symbolic* bz (bitvector bvw))
+(define-symbolic* bw (bitvector bvw))
+(define zero (bv 0 bvw))
+(define one (bv 1 bvw))
+(define two (bv 2 bvw))
