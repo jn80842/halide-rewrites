@@ -21,6 +21,15 @@
 
 (provide (all-defined-out))
 
+(define (div-in-Z-val x y)
+  (if (= (modulo x y) 0) 0 1))
+
+(define (euclidean-div x y)
+  (cond [(and (negative? x) (negative? y)) (+ (- (quotient (abs x) y)) (div-in-Z-val x y))]
+        [(negative? x) (- (- (quotient (abs x) y)) (div-in-Z-val x y)) ]
+        [(negative? y) (quotient x y)]
+        [else (quotient x y)]))
+
 (define (hld-op op i1 i2)
   (op i1 i2))
 
@@ -38,6 +47,9 @@
 
 (define (hld-min i1 i2)
   (hld-op min i1 i2))
+
+(define (hld-div i1 i2)
+  (hld-op euclidean-div i1 i2))
 
 (define (hld-not b [i2 0])
   (if (boolean? b)
@@ -88,6 +100,7 @@
 (define le-operator (operator hld-le 2 "<="))
 (define ge-operator (operator hld-ge 2 ">="))
 (define eq-operator (operator hld-eq 2 "equal?"))
+(define div-operator (operator hld-div 2 "div"))
 
 (define operator-list
   (list add-operator
@@ -104,6 +117,7 @@
         le-operator
         ge-operator
         eq-operator
+     ;;   div-operator
         ))
 
 (define comm-operator-list
@@ -139,6 +153,7 @@
 (define le-idx 11)
 (define ge-idx 12)
 (define eq-idx 13)
+(define div-idx 14)
 
 (define (get-operator-by-idx idx)
   (list-ref operator-list idx))
