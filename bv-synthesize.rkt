@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(define bvw 7)
+(define bvw 8)
 
 (current-bitwidth bvw)
 
@@ -52,60 +52,16 @@
   (if (bvsgt b1 b2) b2 b1))
 
 (define (bvnot-hld b1 b2)
-  (bvnot b1))
+  (not b1))
+
+(define (hld-and b1 b2)
+  (if (and b1 b2) #t #f))
+
+(define (hld-or b1 b2)
+  (if (or b1 b2) #t #f))
 
 (define (noop b1 b2)
   b1)
-
-(define operators-list
-  (list bvadd
-        bvsub
-        bvmul
-        bvsdiv
-        bvsmod
-        bvsmax
-        bvsmin
-        bvand
-        bvor
-        bvslt
-        bvsle
-        bvsgt
-        bvsge
-        bveq
-        noop))
-
-(define (get-operator-function-by-idx idx)
-  (if (bveq idx (bv 0 bvw))
-      bvadd
-      (if (bveq idx (bv 1 bvw))
-          bvsub
-          (if (bveq idx (bv 2 bvw))
-              bvmul
-              (if (bveq idx (bv 3 bvw))
-                  bvsdiv
-                  (if (bveq idx (bv 4 bvw))
-                      bvsmod
-                      (if (bveq idx (bv 5 bvw))
-                          bvsmax
-                          (if (bveq idx (bv 6 bvw))
-                              bvsmin
-                              (if (bveq idx (bv 7 bvw))
-                                  bvand
-                                  (if (bveq idx (bv 8 bvw))
-                                      bvor
-                                      (if (bveq idx (bv 9 bvw))
-                                          bvslt
-                                          (if (bveq idx (bv 10 bvw))
-                                              bvsle
-                                              (if (bveq idx (bv 11 bvw))
-                                                  bvsgt
-                                                  (if (bveq idx (bv 12 bvw))
-                                                      bvsge
-                                                      (if (bveq idx (bv 13 bvw))
-                                                          bveq
-                                                          (if (bveq idx (bv 14 bvw))
-                                                              bvnot-hld
-                                                              noop))))))))))))))))
 
 (define bvadd-idx (bv 0 bvw))
 (define bvsub-idx (bv 1 bvw))
@@ -122,6 +78,39 @@
 (define bvsge-idx (bv 12 bvw))
 (define bveq-idx (bv 13 bvw))
 (define bvnot-idx (bv 14 bvw))
+
+(define (get-operator-function-by-idx idx)
+  (if (bveq idx bvadd-idx)
+      bvadd
+      (if (bveq idx bvsub-idx)
+          bvsub
+          (if (bveq idx bvmul-idx)
+              bvmul
+              (if (bveq idx bvsdiv-idx)
+                  bvsdiv
+                  (if (bveq idx bvsmod-idx)
+                      bvsmod
+                      (if (bveq idx bvsmax-idx)
+                          bvsmax
+                          (if (bveq idx bvsmin-idx)
+                              bvsmin
+                              (if (bveq idx bvand-idx)
+                                  hld-and
+                                  (if (bveq idx bvor-idx)
+                                      hld-or
+                                      (if (bveq idx bvslt-idx)
+                                          bvslt
+                                          (if (bveq idx bvsle-idx)
+                                              bvsle
+                                              (if (bveq idx bvsgt-idx)
+                                                  bvsgt
+                                                  (if (bveq idx bvsge-idx)
+                                                      bvsge
+                                                      (if (bveq idx bveq-idx)
+                                                          bveq
+                                                          (if (bveq idx bvnot-idx)
+                                                              not
+                                                              noop))))))))))))))))
 
 (define (is-noop? idx)
   (bvsgt idx bvnot-idx))
@@ -291,7 +280,7 @@
   (let* ([evaled-rhs (apply (get-sketch-function3 sk) sym-inputs)]
          [evaled-lhs (apply expr sym-inputs)])
     (begin
-      (define binding (time (synthesize #:forall sym-inputs
+      (define binding (time (synthesize #:forall (symbolics sym-inputs)
                                         #:guarantee (assert (equal? evaled-rhs evaled-lhs)))))
       (if (unsat? binding)
           (displayln "could not find expression")
