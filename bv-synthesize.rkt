@@ -168,6 +168,11 @@
       (+ (count-variables2 (fixedsk3-op1 fsk) (fixedsk3-op3 fsk) (fixedsk3-op4 fsk))
          (count-variables2 (fixedsk3-op2 fsk) (fixedsk3-op5 fsk) (fixedsk3-op6 fsk)))))
 
+(define (count-variables3a fsk)
+  (+ (+ (if (single-arg-function? (fixedsk3-op3 fsk)) 1 2) (if (single-arg-function? (fixedsk3-op1 fsk)) 0 (if (single-arg-function? (fixedsk3-op4 fsk)) 1 2)))
+     (if (single-arg-function? (fixedsk3-op0 fsk)) 0
+         (+ (if (single-arg-function? (fixedsk3-op5 fsk)) 1 2) (if (single-arg-function? (fixedsk3-op2 fsk)) 0 (if (single-arg-function? (fixedsk3-op6 fsk)) 1 2))))))
+
 (define (get-fixed-input idx i0 i1 i2 i3)
   (if (bveq idx (bv 0 bvw))
       i0
@@ -276,18 +281,20 @@
         (displayln "no solution")
         (displayln binding))))
 
-(define (synthesize-rewrite expr sk sym-inputs)
-  (let* ([evaled-rhs (apply (get-sketch-function3 sk) sym-inputs)]
-         [evaled-lhs (apply expr sym-inputs)])
+(define (synthesize-rewrite expr sk sym-inputs expr-var-count)
+  (let ([evaled-rhs (apply (get-sketch-function3 sk) sym-inputs)]
+        [evaled-lhs (apply expr sym-inputs)]
+        [sketch-var-count (count-variables3a sk)])
     (begin
       (define binding (time (synthesize #:forall (symbolics sym-inputs)
-                                        #:guarantee (assert (equal? evaled-rhs evaled-lhs)))))
+                                        #:guarantee (assert (and (equal? evaled-rhs evaled-lhs)
+                                                                 (equal? 1 sketch-var-count))))))
       (if (unsat? binding)
           (displayln "could not find expression")
           (displayln (get-string-sketch-function3 (evaluate sk binding)))))))
 
 (define (testcase x y z w p q r s)
-  (bvsle (bvsdiv (bvsub y x) z) (bvsdiv (bvsub w x) z)))
+  (bvsle (bvsdiv (bvsub q p) r) (bvsdiv (bvsub s p) r)))
 
 (define (testcase-c-expr x y z a b c d)
   (bvsle (bvadd (bvmul (bvadd (bvsmin z a) (bvadd (bvmul x b) y)) c) (bvsub (bv 0 7) d))
