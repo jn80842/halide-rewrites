@@ -168,18 +168,34 @@
       (+ (count-variables2 (fixedsk3-op1 fsk) (fixedsk3-op3 fsk) (fixedsk3-op4 fsk))
          (count-variables2 (fixedsk3-op2 fsk) (fixedsk3-op5 fsk) (fixedsk3-op6 fsk)))))
 
+(define (count-variables2a fsk)
+  (+ (if (single-arg-function? (fixedsk2-op1 fsk)) 1 2)
+     (if (single-arg-function? (fixedsk2-op0 fsk)) 0 (if (single-arg-function? (fixedsk2-op2 fsk)) 1 2))))
+
 (define (count-variables3a fsk)
   (+ (+ (if (single-arg-function? (fixedsk3-op3 fsk)) 1 2) (if (single-arg-function? (fixedsk3-op1 fsk)) 0 (if (single-arg-function? (fixedsk3-op4 fsk)) 1 2)))
      (if (single-arg-function? (fixedsk3-op0 fsk)) 0
          (+ (if (single-arg-function? (fixedsk3-op5 fsk)) 1 2) (if (single-arg-function? (fixedsk3-op2 fsk)) 0 (if (single-arg-function? (fixedsk3-op6 fsk)) 1 2))))))
 
-(define (get-fixed-input idx i0 i1 i2 i3)
+(define (get-fixed-input2 idx i0 i1 i2 i3)
   (if (bveq idx (bv 0 bvw))
       i0
       (if (bveq idx (bv 1 bvw))
           i1
           (if (bveq idx (bv 2 bvw))
               i2 i3))))
+
+(define (get-fixed-input-names2 idx)
+  (let ([inputs (for/list ([i (range (expt 2 2))]) (string-append "b" (number->string i)))])
+    (if (term? idx)
+        "null"
+        (if (bveq idx (bv 0 bvw))
+            (list-ref inputs 0)
+            (if (bveq idx (bv 1 bvw))
+                (list-ref inputs 1)
+                (if (bveq idx (bv 2 bvw))
+                    (list-ref inputs 2)
+                    (list-ref inputs 3)))))))
 
 (define (get-fixed-input3 idx inputs)
   (if (bveq idx (bv 0 bvw))
@@ -218,13 +234,13 @@
                                     (list-ref inputs 6)
                                     (list-ref inputs 7)))))))))))
 
-(struct fixedsk2 (op0 op1 op2 input0 input1 input2 input3) #:transparent)
+(struct fixedsk2 (op0 op1 op2 idx0 idx1 idx2 idx3) #:transparent)
 
 (struct fixedsk3 (op0 op1 op2 op3 op4 op5 op6 idx0 idx1 idx2 idx3 idx4 idx5 idx6 idx7) #:transparent)
 
 (define (get-fixed-symbolic-sketch2)
   (let ([ops (for/list ([i (range (sub1 (expt 2 2)))]) (get-sym-bv))]
-        [indexes (for/list ([i (range (expt 2 3))]) (get-sym-bv))])
+        [indexes (for/list ([i (range (expt 2 2))]) (get-sym-bv))])
     (apply fixedsk2 (append ops indexes))))
 
 (define (get-fixed-symbolic-sketch3)
@@ -234,10 +250,10 @@
 
 (define (get-sketch-function2 fsk)
   (λ (i0 i1 i2 i3)
-    ((get-operator-function-by-idx (fixedsk2-op2 fsk)) ((get-operator-function-by-idx (fixedsk2-op0 fsk)) (get-fixed-input (fixedsk2-input0 fsk) i0 i1 i2 i3)
-                                                                                                          (get-fixed-input (fixedsk2-input1 fsk) i0 i1 i2 i3))
-                                                       ((get-operator-function-by-idx (fixedsk2-op1 fsk)) (get-fixed-input (fixedsk2-input2 fsk) i0 i1 i2 i3)
-                                                                                                          (get-fixed-input (fixedsk2-input3 fsk) i0 i1 i2 i3)))))
+    ((get-op (fixedsk2-op2 fsk)) ((get-op (fixedsk2-op0 fsk)) (get-fixed-input2 (fixedsk2-idx0 fsk) i0 i1 i2 i3)
+                                                              (get-fixed-input2 (fixedsk2-idx1 fsk) i0 i1 i2 i3))
+                                 ((get-op (fixedsk2-op1 fsk)) (get-fixed-input2 (fixedsk2-idx2 fsk) i0 i1 i2 i3)
+                                                              (get-fixed-input2 (fixedsk2-idx3 fsk) i0 i1 i2 i3)))))
 (define (get-sketch-function3 fsk)
   (λ (i0 i1 i2 i3 i4 i5 i6 i7)
     (let ([inputs (list i0 i1 i2 i3 i4 i5 i6 i7)])
@@ -249,6 +265,19 @@
                                                                                              (get-fixed-input3 (fixedsk3-idx5 fsk) inputs))
                                                                 ((get-op (fixedsk3-op6 fsk)) (get-fixed-input3 (fixedsk3-idx6 fsk) inputs)
                                                                                              (get-fixed-input3 (fixedsk3-idx7 fsk) inputs)))))))
+
+(define (get-string-sketch-function2 fsk)
+  (string-append "(define (synthesized-function "
+                 (string-join (for/list ([i (range (expt 2 2))]) (string-append "b" (number->string i))) " ")
+                 ")\n"
+                 "  (" (get-operator-name-by-idx (fixedsk2-op0 fsk)) " "
+                 "(" (get-operator-name-by-idx (fixedsk2-op1 fsk)) " "
+                 (get-fixed-input-names2 (fixedsk2-idx0 fsk)) " "
+                 (get-fixed-input-names2 (fixedsk2-idx1 fsk)) ") "
+                 "(" (get-operator-name-by-idx (fixedsk2-op2 fsk)) " "
+                 (get-fixed-input-names2 (fixedsk2-idx2 fsk)) " "
+                 (get-fixed-input-names2 (fixedsk2-idx3 fsk)) ")))")) 
+                 
 (define (get-string-sketch-function3 fsk)
     (string-append "(define (synthesized-function "
                    (string-join (for/list ([i (range (expt 2 3))]) (string-append "b" (number->string i))) " ")
@@ -281,14 +310,24 @@
         (displayln "no solution")
         (displayln binding))))
 
-(define (synthesize-rewrite expr sk sym-inputs expr-var-count)
+(define (synthesize-rewrite2 expr sk sym-inputs expr-var-count)
+  (begin
+    (define binding (time (synthesize #:forall (symbolics sym-inputs)
+                                      #:guarantee (assert (and (equal? (apply (get-sketch-function2 sk) sym-inputs)
+                                                                       (apply expr sym-inputs))
+                                                               (< (count-variables2a sk) expr-var-count))))))
+    (if (unsat? binding)
+        (displayln "could not find expression")
+        (displayln (get-string-sketch-function2 (evaluate sk binding))))))
+
+(define (synthesize-rewrite3 expr sk sym-inputs expr-var-count)
   (let ([evaled-rhs (apply (get-sketch-function3 sk) sym-inputs)]
         [evaled-lhs (apply expr sym-inputs)]
         [sketch-var-count (count-variables3a sk)])
     (begin
       (define binding (time (synthesize #:forall (symbolics sym-inputs)
                                         #:guarantee (assert (and (equal? evaled-rhs evaled-lhs)
-                                                                 (equal? 1 sketch-var-count))))))
+                                                                 (> expr-var-count sketch-var-count))))))
       (if (unsat? binding)
           (displayln "could not find expression")
           (displayln (get-string-sketch-function3 (evaluate sk binding)))))))
