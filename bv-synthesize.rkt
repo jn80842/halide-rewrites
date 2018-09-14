@@ -83,6 +83,7 @@
 (define bvsge-idx (bv 12 bvw))
 (define bveq-idx (bv 13 bvw))
 (define bvnot-idx (bv 14 bvw))
+(define noop-idx (bv 32 bvw)) ;; note that noop is any val greater than 14
 
 (define (get-operator-function-by-idx idx)
   (if (bveq idx bvadd-idx)
@@ -128,7 +129,7 @@
           (if (bveq idx bvmul-idx)
               "bvmul"
               (if (bveq idx bvsdiv-idx)
-                  "bvsdiv"
+                  "hld-div"
                   (if (bveq idx bvsmod-idx)
                       "bvsmod"
                       (if (bveq idx bvsmax-idx)
@@ -136,9 +137,9 @@
                           (if (bveq idx bvsmin-idx)
                               "bvsmin"
                               (if (bveq idx bvand-idx)
-                                  "bvand"
+                                  "hld-and"
                                   (if (bveq idx bvor-idx)
-                                      "bvor"
+                                      "hld-or"
                                       (if (bveq idx bvslt-idx)
                                           "bvslt"
                                           (if (bveq idx bvsle-idx)
