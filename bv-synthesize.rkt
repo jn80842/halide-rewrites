@@ -51,6 +51,11 @@
 (define (bvsmin b1 b2)
   (if (bvsgt b1 b2) b2 b1))
 
+(define (hld-div b1 b2)
+  (if (equal? b2 (bv 0 bvw))
+      (bv 0 bvw)
+      (bvsdiv b1 b2)))
+
 (define (bvnot-hld b1 b2)
   (not b1))
 
@@ -87,7 +92,7 @@
           (if (bveq idx bvmul-idx)
               bvmul
               (if (bveq idx bvsdiv-idx)
-                  bvsdiv
+                  hld-div
                   (if (bveq idx bvsmod-idx)
                       bvsmod
                       (if (bveq idx bvsmax-idx)
@@ -250,9 +255,9 @@
 
 (define (get-sketch-function2 fsk)
   (λ (i0 i1 i2 i3)
-    ((get-op (fixedsk2-op2 fsk)) ((get-op (fixedsk2-op0 fsk)) (get-fixed-input2 (fixedsk2-idx0 fsk) i0 i1 i2 i3)
+    ((get-op (fixedsk2-op0 fsk)) ((get-op (fixedsk2-op1 fsk)) (get-fixed-input2 (fixedsk2-idx0 fsk) i0 i1 i2 i3)
                                                               (get-fixed-input2 (fixedsk2-idx1 fsk) i0 i1 i2 i3))
-                                 ((get-op (fixedsk2-op1 fsk)) (get-fixed-input2 (fixedsk2-idx2 fsk) i0 i1 i2 i3)
+                                 ((get-op (fixedsk2-op2 fsk)) (get-fixed-input2 (fixedsk2-idx2 fsk) i0 i1 i2 i3)
                                                               (get-fixed-input2 (fixedsk2-idx3 fsk) i0 i1 i2 i3)))))
 (define (get-sketch-function3 fsk)
   (λ (i0 i1 i2 i3 i4 i5 i6 i7)
